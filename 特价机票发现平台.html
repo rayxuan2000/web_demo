@@ -967,6 +967,62 @@
       border-radius: 2px;
     }
 
+    /* 搜索结果分页 */
+    .pagination-bar {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      background: var(--cloud);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+    }
+
+    .pagination-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem 1.25rem;
+    }
+
+    .pagination-bar .page-btn {
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--sky-800);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .pagination-bar .page-btn:hover:not(:disabled) {
+      background: var(--sky-50);
+      border-color: var(--sky-400, #38bdf8);
+    }
+
+    .pagination-bar .page-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .pagination-bar .page-btn:focus-visible {
+      outline: 2px solid var(--sky-500);
+      outline-offset: 2px;
+    }
+
+    .pagination-bar .page-info {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .pagination-bar .page-info strong {
+      color: var(--sky-800);
+    }
+
     /* Toast 提示（替代 alert） */
     .toast-host {
       position: fixed;
@@ -1771,6 +1827,7 @@
         <span><span class="legend-dot" style="background:#f59e0b;border-left:4px solid #f59e0b;width:6px;"></span>最短时长</span>
       </div>
       <div class="flight-list" id="search-results"></div>
+      <nav class="pagination-bar" id="search-pagination" aria-label="搜索结果分页" hidden></nav>
     </section>
 
     <!-- 探索 -->
@@ -2732,8 +2789,112 @@
     }
 
     const SEARCH_DEBOUNCE_MS = 280;
+    const PAGE_SIZE = 24;
+    var searchListCurrentPage = 1;
     let searchDebounceTimer;
     let updatingVisualTimer;
+
+    function getActivePanelId() {
+      var el = document.querySelector(".panel.active");
+      return el ? el.id.replace("panel-", "") : "home";
+    }
+
+    /** 将当前栏目 + 搜索条件写入 ?tab=&o=&d=…（首页可不带参数） */
+    function buildSearchUrlParams() {
+      var params = new URLSearchParams();
+      var tab = getActivePanelId();
+      if (tab !== "home") params.set("tab", tab);
+      if (tab !== "search") return params;
+      var s = getFilterState();
+      if (s.origin) params.set("o", s.origin);
+      if (s.dest) params.set("d", s.dest);
+      var dep = document.getElementById("q-depart").value;
+      if (dep) params.set("dep", dep);
+      var ret = document.getElementById("q-return").value;
+      if (ret) params.set("ret", ret);
+      if (s.budgetMin > 0) params.set("bmin", String(Math.floor(s.budgetMin)));
+      if (s.budgetMax < Infinity && !isNaN(s.budgetMax)) params.set("bmax", String(Math.floor(s.budgetMax)));
+      if (s.directOnly) params.set("dir", "1");
+      if (s.airline) params.set("al", s.airline);
+      if (s.maxHours != null) params.set("mh", String(s.maxHours));
+      if (!s.taxOnly) params.set("tax", "0");
+      if (s.refundOnly) params.set("ref", "1");
+      params.set("sort", document.getElementById("sort-results").value);
+      params.set("trip", isRoundTripMode() ? "r" : "o");
+      if (searchListCurrentPage > 1) params.set("p", String(searchListCurrentPage));
+      return params;
+    }
+
+    function syncUrlFromState() {
+      try {
+        var qs = buildSearchUrlParams().toString();
+        var url = location.pathname + (qs ? "?" + qs : "");
+        history.replaceState(null, "", url);
+      } catch (err) {
+        /* file:// 等环境可能失败 */
+      }
+    }
+
+    /** 从地址栏恢复表单与页码（在 initDates、fillAirlineSelect 之后调用） */
+    function applyUrlParamsToForm() {
+      var params = new URLSearchParams(location.search);
+      if (params.has("o")) document.getElementById("q-origin").value = params.get("o");
+      if (params.has("d")) document.getElementById("q-dest").value = params.get("d");
+      if (params.has("dep")) document.getElementById("q-depart").value = params.get("dep");
+      if (params.has("ret")) document.getElementById("q-return").value = params.get("ret");
+      if (params.has("bmin")) document.getElementById("q-budget-min").value = params.get("bmin");
+      if (params.has("bmax")) document.getElementById("q-budget-max").value = params.get("bmax");
+      document.getElementById("f-direct").checked = params.get("dir") === "1";
+      if (params.has("al")) document.getElementById("f-airline").value = params.get("al");
+      if (params.has("mh")) document.getElementById("f-max-hours").value = params.get("mh");
+      document.getElementById("f-tax").checked = params.get("tax") !== "0";
+      document.getElementById("f-refund").checked = params.get("ref") === "1";
+      if (params.has("sort")) {
+        var sel = document.getElementById("sort-results");
+        var v = params.get("sort");
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === v) {
+            sel.value = v;
+            break;
+          }
+        }
+      }
+      if (params.get("trip") === "o") {
+        document.getElementById("trip-oneway").setAttribute("aria-pressed", "true");
+        document.getElementById("trip-round").setAttribute("aria-pressed", "false");
+      } else if (params.get("trip") === "r") {
+        document.getElementById("trip-round").setAttribute("aria-pressed", "true");
+        document.getElementById("trip-oneway").setAttribute("aria-pressed", "false");
+      }
+      var p = parseInt(params.get("p") || "1", 10);
+      searchListCurrentPage = isNaN(p) || p < 1 ? 1 : p;
+    }
+
+    function renderPaginationHtml(page, totalPages, total) {
+      var start = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+      var end = Math.min(page * PAGE_SIZE, total);
+      return (
+        '<div class="pagination-inner">' +
+        '<button type="button" class="page-btn" data-page-nav="prev"' +
+        (page <= 1 ? " disabled" : "") +
+        ">上一页</button>" +
+        '<span class="page-info">第 <strong>' +
+        page +
+        "</strong> / " +
+        totalPages +
+        " 页 · 本页显示第 " +
+        start +
+        "–" +
+        end +
+        " 条 · 共 <strong>" +
+        total +
+        "</strong> 条</span>" +
+        '<button type="button" class="page-btn" data-page-nav="next"' +
+        (page >= totalPages ? " disabled" : "") +
+        ">下一页</button>" +
+        "</div>"
+      );
+    }
 
     function buildEmptySearchHtml() {
       const ids = [...MOCK_FLIGHTS]
@@ -2761,19 +2922,25 @@
     function scheduleSearch(animate) {
       clearTimeout(searchDebounceTimer);
       searchDebounceTimer = setTimeout(function () {
-        runSearch(animate);
+        runSearch(animate, {});
       }, SEARCH_DEBOUNCE_MS);
     }
 
     function scheduleSearchImmediate(animate) {
       clearTimeout(searchDebounceTimer);
-      runSearch(animate);
+      runSearch(animate, {});
     }
 
-    function runSearch(animate) {
+    /**
+     * @param {boolean} animate
+     * @param {{ keepPage?: boolean, skipUrl?: boolean }} urlOpts keepPage=true 翻页时不重置页码；skipUrl=true 不写地址栏
+     */
+    function runSearch(animate, urlOpts) {
+      urlOpts = urlOpts || {};
       syncTripModeUi();
       updateRoundtripBanner();
       var container = document.getElementById("search-results");
+      var pager = document.getElementById("search-pagination");
       if (animate) {
         container.classList.add("updating");
         clearTimeout(updatingVisualTimer);
@@ -2781,13 +2948,34 @@
           container.classList.remove("updating");
         }, 200);
       }
+      if (!urlOpts.keepPage) {
+        searchListCurrentPage = 1;
+      }
       var filtered = sortFlights(filterFlights(MOCK_FLIGHTS));
       var annotated = annotateHighlights(filtered);
-      document.getElementById("result-count").textContent = String(annotated.length);
-      container.innerHTML = annotated.length ? annotated.map(flightCardHtml).join("") : buildEmptySearchHtml();
+      var total = annotated.length;
+      var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      if (searchListCurrentPage > totalPages) {
+        searchListCurrentPage = totalPages;
+      }
+      document.getElementById("result-count").textContent = String(total);
+      var slice = annotated.slice((searchListCurrentPage - 1) * PAGE_SIZE, searchListCurrentPage * PAGE_SIZE);
+      container.innerHTML = total ? slice.map(flightCardHtml).join("") : buildEmptySearchHtml();
+      if (pager) {
+        if (total <= PAGE_SIZE) {
+          pager.hidden = true;
+          pager.innerHTML = "";
+        } else {
+          pager.hidden = false;
+          pager.innerHTML = renderPaginationHtml(searchListCurrentPage, totalPages, total);
+        }
+      }
       updateSearchMetaLine();
       touchUpdatedLabel();
       tickHeaderClock();
+      if (!urlOpts.skipUrl) {
+        syncUrlFromState();
+      }
     }
 
     function renderPopularChips() {
@@ -2933,7 +3121,7 @@
 
     function switchPanel(id, opts) {
       const options = opts || {};
-      const skipHash = options.skipHash === true;
+      const skipUrl = options.skipUrl === true || options.skipHash === true;
       if (!PANEL_KEYS.includes(id)) id = "home";
 
       document.querySelectorAll(".panel").forEach((p) => {
@@ -2948,17 +3136,8 @@
         t.setAttribute("tabindex", on ? "0" : "-1");
       });
 
-      if (!skipHash && history.replaceState) {
-        try {
-          const path = location.pathname + location.search;
-          if (id === "home") {
-            history.replaceState(null, "", path);
-          } else {
-            history.replaceState(null, "", path + "#" + id);
-          }
-        } catch (err) {
-          /* 少数浏览器在 file:// 下限制 replaceState，忽略即可 */
-        }
+      if (!skipUrl) {
+        syncUrlFromState();
       }
 
       if (id === "saved") {
@@ -2968,12 +3147,18 @@
       window.scrollTo(0, 0);
     }
 
-    /** 首次打开时若地址栏带 #search 等，自动打开对应栏目 */
-    function applyHashFromLocation() {
-      const h = (location.hash || "").replace(/^#/, "");
-      if (PANEL_KEYS.includes(h)) {
-        switchPanel(h, { skipHash: true });
-      }
+    /** ?tab= 优先，其次兼容 #hash */
+    function getTabFromLocation() {
+      var params = new URLSearchParams(location.search);
+      var t = params.get("tab");
+      if (t && PANEL_KEYS.includes(t)) return t;
+      var h = (location.hash || "").replace(/^#/, "");
+      if (PANEL_KEYS.includes(h)) return h;
+      return "home";
+    }
+
+    function applyRoutingFromLocation() {
+      switchPanel(getTabFromLocation(), { skipUrl: true });
     }
 
     // ---------- 初始化日期默认值（演示用） ----------
@@ -3041,10 +3226,18 @@
       switchPanel(tabs[n].getAttribute("data-panel"));
     });
 
+    window.addEventListener("popstate", function () {
+      applyUrlParamsToForm();
+      switchPanel(getTabFromLocation(), { skipUrl: true });
+      runSearch(false, { skipUrl: true, keepPage: true });
+      updateCompareBar();
+    });
+
     window.addEventListener("hashchange", function () {
-      let h = (location.hash || "").replace(/^#/, "");
-      if (!PANEL_KEYS.includes(h)) h = "home";
-      switchPanel(h, { skipHash: true });
+      var h = (location.hash || "").replace(/^#/, "");
+      if (!h || !PANEL_KEYS.includes(h)) return;
+      switchPanel(h, { skipUrl: true });
+      runSearch(false, { skipUrl: true, keepPage: true });
     });
 
     document.getElementById("trip-oneway").addEventListener("click", function () {
@@ -3177,6 +3370,15 @@
       showToast("已清空出发地、目的地、预算和勾选条件（日期与返程保留）");
     });
 
+    document.getElementById("search-pagination").addEventListener("click", function (e) {
+      var nav = e.target.closest("[data-page-nav]");
+      if (!nav || nav.disabled) return;
+      var dir = nav.getAttribute("data-page-nav");
+      if (dir === "prev") searchListCurrentPage = Math.max(1, searchListCurrentPage - 1);
+      else if (dir === "next") searchListCurrentPage = searchListCurrentPage + 1;
+      runSearch(true, { keepPage: true });
+    });
+
     document.getElementById("search-results").addEventListener("click", function (e) {
       var det = e.target.closest("[data-detail-id]");
       if (det) {
@@ -3239,12 +3441,18 @@
     // ---------- 启动 ----------
     fillAirlineSelect();
     initDates();
+    applyUrlParamsToForm();
+    applyRoutingFromLocation();
     syncTripModeUi();
     renderPopularChips();
     renderHome();
     renderExplore();
-    applyHashFromLocation();
-    runSearch(false);
+    runSearch(false, { skipUrl: true, keepPage: true });
+    try {
+      syncUrlFromState();
+    } catch (err) {
+      /* file:// */
+    }
     setLibraryStat();
     updateCompareBar();
     renderCompareTable();
