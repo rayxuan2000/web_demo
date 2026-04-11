@@ -1297,6 +1297,72 @@
       background: white;
     }
 
+    .toolbar-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem 1.25rem;
+    }
+
+    .page-size-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .page-size-wrap label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .page-size-wrap select,
+    .page-size-wrap .search-page-custom-input {
+      padding: 0.4rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 0.85rem;
+      background: white;
+    }
+
+    .page-size-wrap select {
+      min-width: 6.5rem;
+    }
+
+    .search-page-custom-input {
+      width: 4.5rem;
+      min-width: 0;
+    }
+
+    .pagination-jump-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem 0.65rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .pagination-jump-row label {
+      white-space: nowrap;
+    }
+
+    .pagination-jump-row input[type="number"] {
+      width: 4rem;
+      padding: 0.35rem 0.45rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
     /* ========== 航班卡片（OTA 风格） ========== */
     .flight-card--pro {
       padding: 0;
@@ -1810,15 +1876,40 @@
           <p class="data-updated" id="data-updated" aria-live="polite"></p>
           <p class="library-stat" id="library-stat" aria-live="polite"></p>
         </div>
-        <div class="sort-wrap">
-          <label for="sort-results">排序</label>
-          <select id="sort-results" aria-label="搜索结果排序">
-            <option value="smart">智能推荐</option>
-            <option value="price">价格低 → 高</option>
-            <option value="duration">飞行时间短 → 长</option>
-            <option value="depart_early">起飞早 → 晚</option>
-            <option value="depart_late">起飞晚 → 早</option>
-          </select>
+        <div class="toolbar-right">
+          <div class="sort-wrap">
+            <label for="sort-results">排序</label>
+            <select id="sort-results" aria-label="搜索结果排序">
+              <option value="smart">智能推荐</option>
+              <option value="price">价格低 → 高</option>
+              <option value="duration">飞行时间短 → 长</option>
+              <option value="depart_early">起飞早 → 晚</option>
+              <option value="depart_late">起飞晚 → 早</option>
+            </select>
+          </div>
+          <div class="page-size-wrap">
+            <label for="search-page-size">每页条数</label>
+            <select id="search-page-size" aria-label="每页显示条数">
+              <option value="12">12 条</option>
+              <option value="24" selected>24 条</option>
+              <option value="36">36 条</option>
+              <option value="48">48 条</option>
+              <option value="72">72 条</option>
+              <option value="96">96 条</option>
+              <option value="custom">自定义…</option>
+            </select>
+            <input
+              type="number"
+              id="search-page-size-custom"
+              class="search-page-custom-input"
+              min="6"
+              max="120"
+              step="1"
+              value="24"
+              aria-label="自定义每页条数"
+              hidden
+            />
+          </div>
         </div>
       </div>
       <div class="legend">
@@ -1827,7 +1918,15 @@
         <span><span class="legend-dot" style="background:#f59e0b;border-left:4px solid #f59e0b;width:6px;"></span>最短时长</span>
       </div>
       <div class="flight-list" id="search-results"></div>
-      <nav class="pagination-bar" id="search-pagination" aria-label="搜索结果分页" hidden></nav>
+      <nav class="pagination-bar" id="search-pagination" aria-label="搜索结果分页" hidden>
+        <div id="search-pagination-nav" class="pagination-inner"></div>
+        <div class="pagination-jump-row">
+          <label for="search-page-jump">跳转到第</label>
+          <input type="number" id="search-page-jump" min="1" step="1" inputmode="numeric" aria-label="要跳转的页码" />
+          <span>页</span>
+          <button type="button" class="page-btn" id="search-page-jump-btn">跳转</button>
+        </div>
+      </nav>
     </section>
 
     <!-- 探索 -->
@@ -2789,10 +2888,77 @@
     }
 
     const SEARCH_DEBOUNCE_MS = 280;
-    const PAGE_SIZE = 24;
+    const DEFAULT_SEARCH_PAGE_SIZE = 24;
+    const MIN_SEARCH_PAGE_SIZE = 6;
+    const MAX_SEARCH_PAGE_SIZE = 120;
+    const SEARCH_PAGE_PRESETS = [12, 24, 36, 48, 72, 96];
     var searchListCurrentPage = 1;
+    var searchLastTotalPages = 1;
     let searchDebounceTimer;
     let updatingVisualTimer;
+
+    function clampSearchPageSize(n) {
+      var x = parseInt(n, 10);
+      if (isNaN(x)) return DEFAULT_SEARCH_PAGE_SIZE;
+      return Math.min(MAX_SEARCH_PAGE_SIZE, Math.max(MIN_SEARCH_PAGE_SIZE, x));
+    }
+
+    function syncPageSizeControlsFromValue(size) {
+      size = clampSearchPageSize(size);
+      var sel = document.getElementById("search-page-size");
+      var inp = document.getElementById("search-page-size-custom");
+      if (!sel) return size;
+      if (SEARCH_PAGE_PRESETS.indexOf(size) >= 0) {
+        sel.value = String(size);
+        if (inp) {
+          inp.hidden = true;
+          inp.value = String(size);
+        }
+      } else {
+        sel.value = "custom";
+        if (inp) {
+          inp.hidden = false;
+          inp.value = String(size);
+        }
+      }
+      return size;
+    }
+
+    function getSearchPageSize() {
+      var sel = document.getElementById("search-page-size");
+      if (!sel) return DEFAULT_SEARCH_PAGE_SIZE;
+      if (sel.value === "custom") {
+        var inp = document.getElementById("search-page-size-custom");
+        return clampSearchPageSize(inp ? inp.value : DEFAULT_SEARCH_PAGE_SIZE);
+      }
+      var n = parseInt(sel.value, 10);
+      return clampSearchPageSize(isNaN(n) ? DEFAULT_SEARCH_PAGE_SIZE : n);
+    }
+
+    function syncPageSizeCustomVisibility() {
+      var sel = document.getElementById("search-page-size");
+      var inp = document.getElementById("search-page-size-custom");
+      if (!sel || !inp) return;
+      inp.hidden = sel.value !== "custom";
+    }
+
+    function doSearchPageJump() {
+      var jumpInp = document.getElementById("search-page-jump");
+      if (!jumpInp) return;
+      var totalPages = searchLastTotalPages;
+      var raw = parseInt(jumpInp.value, 10);
+      if (isNaN(raw) || raw < 1) {
+        showToast("请输入有效页码（≥1）");
+        return;
+      }
+      var target = Math.min(totalPages, Math.max(1, raw));
+      if (target !== raw) {
+        showToast("已跳到第 " + target + " 页（共 " + totalPages + " 页）");
+      }
+      searchListCurrentPage = target;
+      jumpInp.value = "";
+      runSearch(true, { keepPage: true });
+    }
 
     function getActivePanelId() {
       var el = document.querySelector(".panel.active");
@@ -2821,6 +2987,8 @@
       if (s.refundOnly) params.set("ref", "1");
       params.set("sort", document.getElementById("sort-results").value);
       params.set("trip", isRoundTripMode() ? "r" : "o");
+      var ps = getSearchPageSize();
+      if (ps !== DEFAULT_SEARCH_PAGE_SIZE) params.set("ps", String(ps));
       if (searchListCurrentPage > 1) params.set("p", String(searchListCurrentPage));
       return params;
     }
@@ -2866,15 +3034,20 @@
         document.getElementById("trip-round").setAttribute("aria-pressed", "true");
         document.getElementById("trip-oneway").setAttribute("aria-pressed", "false");
       }
+      if (params.has("ps")) {
+        syncPageSizeControlsFromValue(params.get("ps"));
+      } else {
+        syncPageSizeControlsFromValue(DEFAULT_SEARCH_PAGE_SIZE);
+      }
       var p = parseInt(params.get("p") || "1", 10);
       searchListCurrentPage = isNaN(p) || p < 1 ? 1 : p;
     }
 
-    function renderPaginationHtml(page, totalPages, total) {
-      var start = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-      var end = Math.min(page * PAGE_SIZE, total);
+    /** 仅上一页/下一页与摘要（容器为 #search-pagination-nav，勿再包一层 pagination-inner） */
+    function renderPaginationHtml(page, totalPages, total, pageSize) {
+      var start = total === 0 ? 0 : (page - 1) * pageSize + 1;
+      var end = Math.min(page * pageSize, total);
       return (
-        '<div class="pagination-inner">' +
         '<button type="button" class="page-btn" data-page-nav="prev"' +
         (page <= 1 ? " disabled" : "") +
         ">上一页</button>" +
@@ -2888,11 +3061,12 @@
         end +
         " 条 · 共 <strong>" +
         total +
-        "</strong> 条</span>" +
+        "</strong> 条（每页 " +
+        pageSize +
+        " 条）</span>" +
         '<button type="button" class="page-btn" data-page-nav="next"' +
         (page >= totalPages ? " disabled" : "") +
-        ">下一页</button>" +
-        "</div>"
+        ">下一页</button>"
       );
     }
 
@@ -2951,23 +3125,31 @@
       if (!urlOpts.keepPage) {
         searchListCurrentPage = 1;
       }
+      var pageSize = getSearchPageSize();
       var filtered = sortFlights(filterFlights(MOCK_FLIGHTS));
       var annotated = annotateHighlights(filtered);
       var total = annotated.length;
-      var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      var totalPages = Math.max(1, Math.ceil(total / pageSize));
+      searchLastTotalPages = totalPages;
       if (searchListCurrentPage > totalPages) {
         searchListCurrentPage = totalPages;
       }
       document.getElementById("result-count").textContent = String(total);
-      var slice = annotated.slice((searchListCurrentPage - 1) * PAGE_SIZE, searchListCurrentPage * PAGE_SIZE);
+      var slice = annotated.slice((searchListCurrentPage - 1) * pageSize, searchListCurrentPage * pageSize);
       container.innerHTML = total ? slice.map(flightCardHtml).join("") : buildEmptySearchHtml();
-      if (pager) {
-        if (total <= PAGE_SIZE) {
+      var navInner = document.getElementById("search-pagination-nav");
+      var jumpInp = document.getElementById("search-page-jump");
+      if (jumpInp) {
+        jumpInp.max = String(totalPages);
+        jumpInp.placeholder = "1–" + totalPages;
+      }
+      if (pager && navInner) {
+        if (total <= pageSize) {
           pager.hidden = true;
-          pager.innerHTML = "";
+          navInner.innerHTML = "";
         } else {
           pager.hidden = false;
-          pager.innerHTML = renderPaginationHtml(searchListCurrentPage, totalPages, total);
+          navInner.innerHTML = renderPaginationHtml(searchListCurrentPage, totalPages, total, pageSize);
         }
       }
       updateSearchMetaLine();
@@ -3290,6 +3472,21 @@
     });
     document.getElementById("sort-results").addEventListener("change", function () {
       scheduleSearchImmediate(true);
+    });
+    document.getElementById("search-page-size").addEventListener("change", function () {
+      syncPageSizeCustomVisibility();
+      scheduleSearchImmediate(true);
+    });
+    document.getElementById("search-page-size-custom").addEventListener("change", function () {
+      scheduleSearchImmediate(true);
+    });
+    document.getElementById("search-page-jump-btn").addEventListener("click", function () {
+      doSearchPageJump();
+    });
+    document.getElementById("search-page-jump").addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      doSearchPageJump();
     });
     document.getElementById("price-modal-close").addEventListener("click", closePriceModal);
     document.getElementById("price-modal").addEventListener("click", function (e) {
