@@ -1235,6 +1235,241 @@
       border-radius: 2px;
     }
 
+    /* 低价日历（仿 OTA 灵活日期条） */
+    .pcal-wrap {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem 0.85rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+    }
+
+    .pcal-wrap.pcal-wrap--muted {
+      background: #f8fafc;
+    }
+
+    .pcal-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.35rem 0.75rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .pcal-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--sky-900);
+    }
+
+    .pcal-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .pcal-strip {
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      padding-bottom: 0.15rem;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .pcal-cell {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      min-width: 4.35rem;
+      padding: 0.45rem 0.4rem 0.4rem;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+    }
+
+    .pcal-cell:hover {
+      border-color: var(--sky-400, #38bdf8);
+      background: var(--sky-50);
+    }
+
+    .pcal-cell:focus-visible {
+      outline: 2px solid var(--sky-500);
+      outline-offset: 2px;
+    }
+
+    .pcal-cell.is-current {
+      border-color: var(--sky-600);
+      background: linear-gradient(180deg, #e0f2fe, #fff);
+      box-shadow: 0 0 0 1px rgba(2, 132, 199, 0.25);
+    }
+
+    .pcal-cell.is-cheapest {
+      border-color: #34d399;
+      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.35);
+    }
+
+    .pcal-cell .wd {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .pcal-cell .md {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--sky-900);
+      margin: 0.1rem 0;
+    }
+
+    .pcal-cell .pr {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--sky-600);
+    }
+
+    .pcal-cell .pr--empty {
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 0.68rem;
+    }
+
+    .fc-policy-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.5rem;
+      margin-top: 0.35rem;
+      align-items: center;
+    }
+
+    .policy-pill {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .policy-pill--ok {
+      background: #ecfdf5;
+      color: #047857;
+    }
+
+    .policy-pill--warn {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+    .alerts-layout {
+      display: grid;
+      gap: 1.5rem;
+      max-width: 52rem;
+    }
+
+    .alerts-card {
+      background: var(--cloud);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.2rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .alerts-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      color: var(--sky-900);
+    }
+
+    .alerts-card .lead {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin: 0 0 0.85rem;
+      line-height: 1.5;
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.65rem;
+    }
+
+    .preset-row input[type="text"] {
+      flex: 1 1 160px;
+      min-width: 0;
+      padding: 0.45rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+    }
+
+    .preset-list,
+    .alert-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .preset-item,
+    .alert-item {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.55rem 0.65rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.84rem;
+    }
+
+    .preset-item .meta,
+    .alert-item .meta {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .alert-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: flex-end;
+      margin-bottom: 0.75rem;
+    }
+
+    .alert-form .field-inline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .alert-form label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .alert-form input {
+      padding: 0.4rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      width: 7rem;
+    }
+
     /* 搜索结果分页 */
     .pagination-bar {
       margin-top: 1rem;
@@ -2050,6 +2285,7 @@
         <button type="button" class="nav-tab active" id="tab-home" data-panel="home" role="tab" aria-selected="true" aria-controls="panel-home" tabindex="0">首页推荐</button>
         <button type="button" class="nav-tab" id="tab-search" data-panel="search" role="tab" aria-selected="false" aria-controls="panel-search" tabindex="-1">搜索机票</button>
         <button type="button" class="nav-tab" id="tab-explore" data-panel="explore" role="tab" aria-selected="false" aria-controls="panel-explore" tabindex="-1">目的地探索</button>
+        <button type="button" class="nav-tab" id="tab-alerts" data-panel="alerts" role="tab" aria-selected="false" aria-controls="panel-alerts" tabindex="-1">订阅与方案</button>
         <button type="button" class="nav-tab" id="tab-saved" data-panel="saved" role="tab" aria-selected="false" aria-controls="panel-saved" tabindex="-1">收藏与对比</button>
         <button type="button" class="nav-tab" id="tab-rules" data-panel="rules" role="tab" aria-selected="false" aria-controls="panel-rules" tabindex="-1">购票提示</button>
       </nav>
@@ -2194,6 +2430,11 @@
           </section>
 
           <footer class="booking-widget-footer">
+            <div class="preset-row">
+              <input type="text" id="preset-name-input" maxlength="24" placeholder="方案名称，如：春节回家" aria-label="保存搜索方案的名称" />
+              <button type="button" class="btn btn-secondary" id="btn-save-preset">保存当前条件为方案</button>
+              <button type="button" class="btn btn-secondary" id="btn-goto-alerts">管理方案与低价提醒</button>
+            </div>
             <div class="search-actions-row">
               <button type="button" class="btn btn-primary" id="btn-reset-filters">恢复默认条件</button>
               <button type="button" class="btn btn-secondary" id="btn-clear-filters">清空城市与筛选</button>
@@ -2203,6 +2444,17 @@
       </div>
 
       <div class="roundtrip-banner" id="roundtrip-banner" hidden></div>
+
+      <div class="pcal-wrap" id="price-calendar-wrap" hidden>
+        <div class="pcal-head">
+          <span class="pcal-title">低价日历</span>
+          <span class="pcal-hint" id="price-calendar-hint">出发前后共 11 天 · 演示价随日期浮动 · 点击切换出发日</span>
+        </div>
+        <div class="pcal-strip" id="price-calendar-strip" role="list"></div>
+      </div>
+      <div class="pcal-wrap pcal-wrap--muted" id="price-calendar-placeholder">
+        <p class="pcal-hint" style="margin:0;">填写<strong>出发地</strong>与<strong>到达地</strong>后，将显示该方向的低价日历（与当前筛选条件联动，不含预算上限过滤以便发现低价日）。</p>
+      </div>
 
       <div class="results-toolbar">
         <div class="toolbar-left">
@@ -2274,6 +2526,33 @@
       <div class="dest-grid" id="explore-grid"></div>
     </section>
 
+    <!-- 订阅与方案 -->
+    <section id="panel-alerts" class="panel" role="tabpanel" aria-labelledby="tab-alerts" aria-hidden="true">
+      <h2 class="section-title">订阅与方案</h2>
+      <p class="panel-lead">贴近真实产品：保存常用搜索条件、设置低价提醒（浏览器内演示，数据存于本机 localStorage）。</p>
+      <div class="alerts-layout">
+        <div class="alerts-card">
+          <h3>已存搜索方案</h3>
+          <p class="lead">一键恢复当时填写的城市、日期、筛选与排序（不含分页）。</p>
+          <ul class="preset-list" id="preset-list"></ul>
+          <p class="field-hint" id="preset-empty" style="margin-top:0.5rem;">暂无方案。在「搜索机票」底部输入名称并保存即可。</p>
+        </div>
+        <div class="alerts-card">
+          <h3>低价提醒（演示）</h3>
+          <p class="lead">当该线路在所选出发日下的演示低价 ≤ 目标价时，通过页面内提示模拟通知（约每 45 秒检测一次）。不会发送真实短信或邮件。</p>
+          <div class="alert-form">
+            <div class="field-inline">
+              <label for="alert-max-yuan">目标价上限（元）</label>
+              <input type="number" id="alert-max-yuan" min="100" max="50000" step="10" placeholder="如 800" />
+            </div>
+            <button type="button" class="btn btn-primary" id="btn-add-alert">添加提醒（沿用搜索页当前城市与出发日）</button>
+          </div>
+          <ul class="alert-list" id="alert-list"></ul>
+          <p class="field-hint" id="alert-empty" style="margin-top:0.5rem;">暂无提醒。请先在「搜索机票」填写出发/到达与出发日期。</p>
+        </div>
+      </div>
+    </section>
+
     <!-- 收藏对比 -->
     <section id="panel-saved" class="panel" role="tabpanel" aria-labelledby="tab-saved" aria-hidden="true">
       <h2 class="section-title">我的收藏</h2>
@@ -2318,6 +2597,7 @@
         <ul>
           <li>所有航班、价格、折扣均为前端模拟，用于展示产品与交互流程。</li>
           <li>收藏与对比数据保存在本浏览器会话中，刷新页面后仍会保留（使用 localStorage）。</li>
+          <li>「订阅与方案」中的已存搜索条件与低价提醒同样仅存于本机，不会上传服务器。</li>
         </ul>
       </div>
     </section>
@@ -2636,6 +2916,7 @@
         f.aircraft = planes[h % planes.length];
         f.meal = f.durationMin >= 240 ? "正餐或热食" : f.durationMin >= 100 ? "点心/饮品" : "饮品";
         f.seatsLeft = 2 + (h % 11);
+        f.refundLabel = f.refundable ? "退改较灵活" : h % 4 === 0 ? "不可退票" : "退改受限 · 以客规为准";
       });
     }
 
@@ -2687,6 +2968,43 @@
       if (!isRoundTripMode()) return false;
       var v = document.getElementById("q-return").value;
       return Boolean(v && v.trim());
+    }
+
+    function getSelectedDepartIso() {
+      var el = document.getElementById("q-depart");
+      var v = el && el.value;
+      if (v) return v;
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function getSelectedReturnIso() {
+      var el = document.getElementById("q-return");
+      var v = el && el.value;
+      if (v) return v;
+      return getSelectedDepartIso();
+    }
+
+    /** 同一航班在不同出发日的演示价（用于低价日历与列表联动） */
+    function priceForDepartDate(f, iso) {
+      var base = effectivePrice(f);
+      var h = hashFlightId(String(f.id) + "|" + String(iso));
+      var delta = (h % 260) - 110;
+      return Math.max(66, base + delta);
+    }
+
+    function displayTripPriceForDate(f, depIso) {
+      var one = priceForDepartDate(f, depIso);
+      if (!hasReturnDate()) return one;
+      var retIso = getSelectedReturnIso();
+      return one + Math.round(priceForDepartDate(f, retIso) * 0.91);
+    }
+
+    /** 提醒检测用：按创建时记录的返程日计算双程演示价（无 retIso 则按单程） */
+    function tripPriceForAlert(f, alert) {
+      var one = priceForDepartDate(f, alert.departIso);
+      var ret = alert && alert.retIso && String(alert.retIso).trim();
+      if (!ret) return one;
+      return one + Math.round(priceForDepartDate(f, ret) * 0.91);
     }
 
     function parseTimeToMin(t) {
@@ -2785,12 +3103,264 @@
     }
 
     /**
-     * 筛选与高亮用的「总价」：单程=含税/估算价；往返=去程+回程演示价（回程按去程约 91% 模拟联订优惠）。
+     * 筛选与高亮用的「总价」：随所选出发/返程日变化；往返=去程演示价+回程演示价×0.91。
      */
     function tripPriceForFilter(f) {
-      const one = effectivePrice(f);
-      if (!hasReturnDate()) return one;
-      return Math.round(one + one * 0.91);
+      return displayTripPriceForDate(f, getSelectedDepartIso());
+    }
+
+    function filterFlightsIgnoringBudget(list) {
+      var s = getFilterState();
+      return list.filter(function (f) {
+        if (!matchesCityOrCode(f.origin, f.fromCode, s.origin)) return false;
+        if (!matchesCityOrCode(f.dest, f.toCode, s.dest)) return false;
+        if (s.directOnly && f.stops > 0) return false;
+        if (s.airline && f.airline !== s.airline) return false;
+        if (s.maxHours != null && f.durationMin > s.maxHours * 60) return false;
+        if (s.taxOnly && !f.taxIncluded) return false;
+        if (s.refundOnly && !f.refundable) return false;
+        return true;
+      });
+    }
+
+    function addCalendarDaysIso(iso, n) {
+      var d = new Date(iso + "T12:00:00");
+      if (isNaN(d.getTime())) return iso;
+      d.setDate(d.getDate() + n);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function minCalendarPriceForDepart(depIso) {
+      var list = filterFlightsIgnoringBudget(MOCK_FLIGHTS);
+      if (!list.length) return null;
+      var min = Infinity;
+      list.forEach(function (f) {
+        var p = displayTripPriceForDate(f, depIso);
+        if (p < min) min = p;
+      });
+      return min === Infinity ? null : min;
+    }
+
+    function renderPriceCalendar() {
+      var wrap = document.getElementById("price-calendar-wrap");
+      var ph = document.getElementById("price-calendar-placeholder");
+      var strip = document.getElementById("price-calendar-strip");
+      if (!wrap || !strip) return;
+      var o = document.getElementById("q-origin").value.trim();
+      var dest = document.getElementById("q-dest").value.trim();
+      if (!o || !dest) {
+        wrap.hidden = true;
+        if (ph) ph.style.display = "";
+        return;
+      }
+      if (ph) ph.style.display = "none";
+      wrap.hidden = false;
+      var baseIso = getSelectedDepartIso();
+      var currentDepart = document.getElementById("q-depart").value;
+      var cells = [];
+      var i;
+      var mins = [];
+      for (i = -3; i <= 7; i++) {
+        var iso = addCalendarDaysIso(baseIso, i);
+        var m = minCalendarPriceForDepart(iso);
+        cells.push({ iso: iso, min: m });
+        if (m != null) mins.push(m);
+      }
+      var cheapestIso = null;
+      if (mins.length) {
+        var best = Math.min.apply(null, mins);
+        for (i = 0; i < cells.length; i++) {
+          if (cells[i].min === best) {
+            cheapestIso = cells[i].iso;
+            break;
+          }
+        }
+      }
+      strip.innerHTML = cells
+        .map(function (x) {
+          var wk = ["日", "一", "二", "三", "四", "五", "六"];
+          var dt = new Date(x.iso + "T12:00:00");
+          var wd = wk[dt.getDay()];
+          var md = dt.getMonth() + 1 + "/" + dt.getDate();
+          var cls = "pcal-cell";
+          if (x.iso === currentDepart) cls += " is-current";
+          if (cheapestIso && x.iso === cheapestIso) cls += " is-cheapest";
+          var pr =
+            x.min != null
+              ? '<span class="pr">¥' + x.min + "</span>"
+              : '<span class="pr pr--empty">—</span>';
+          return (
+            '<button type="button" class="' +
+            cls +
+            '" role="listitem" data-cal-iso="' +
+            escapeHtml(x.iso) +
+            '" aria-label="' +
+            escapeHtml(md + "周" + wd + " 演示低价") +
+            '"><span class="wd">' +
+            wd +
+            '</span><span class="md">' +
+            md +
+            "</span>" +
+            pr +
+            "</button>"
+          );
+        })
+        .join("");
+    }
+
+    const STORAGE_PRESETS = "skydeal_presets_v1";
+    const STORAGE_ALERTS = "skydeal_alerts_v1";
+
+    function loadJsonStore(key, fallback) {
+      try {
+        var raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function saveJsonStore(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (e) {
+        /* 隐私模式等 */
+      }
+    }
+
+    function capturePresetPayload() {
+      return {
+        trip: isRoundTripMode() ? "r" : "o",
+        o: document.getElementById("q-origin").value,
+        d: document.getElementById("q-dest").value,
+        dep: document.getElementById("q-depart").value,
+        ret: document.getElementById("q-return").value,
+        bmin: document.getElementById("q-budget-min").value,
+        bmax: document.getElementById("q-budget-max").value,
+        dir: document.getElementById("f-direct").checked,
+        al: document.getElementById("f-airline").value,
+        mh: document.getElementById("f-max-hours").value,
+        tax: document.getElementById("f-tax").checked,
+        ref: document.getElementById("f-refund").checked,
+        sort: document.getElementById("sort-results").value,
+        ps: getSearchPageSize(),
+      };
+    }
+
+    function applyPresetPayload(p) {
+      document.getElementById("q-origin").value = p.o || "";
+      document.getElementById("q-dest").value = p.d || "";
+      document.getElementById("q-depart").value = p.dep || "";
+      document.getElementById("q-return").value = p.ret || "";
+      document.getElementById("q-budget-min").value = p.bmin || "";
+      document.getElementById("q-budget-max").value = p.bmax || "";
+      document.getElementById("f-direct").checked = Boolean(p.dir);
+      document.getElementById("f-airline").value = p.al || "";
+      document.getElementById("f-max-hours").value = p.mh || "";
+      document.getElementById("f-tax").checked = p.tax !== false;
+      document.getElementById("f-refund").checked = Boolean(p.ref);
+      if (p.sort) document.getElementById("sort-results").value = p.sort;
+      if (p.ps != null) syncPageSizeControlsFromValue(p.ps);
+      if (p.trip === "o") {
+        document.getElementById("trip-oneway").setAttribute("aria-pressed", "true");
+        document.getElementById("trip-round").setAttribute("aria-pressed", "false");
+      } else {
+        document.getElementById("trip-round").setAttribute("aria-pressed", "true");
+        document.getElementById("trip-oneway").setAttribute("aria-pressed", "false");
+      }
+      syncTripModeUi();
+    }
+
+    function renderAlertsPanel() {
+      var presets = loadJsonStore(STORAGE_PRESETS, []);
+      var pl = document.getElementById("preset-list");
+      var pe = document.getElementById("preset-empty");
+      if (pl) {
+        pl.innerHTML = presets
+          .map(function (p) {
+            return (
+              '<li class="preset-item"><div><strong>' +
+              escapeHtml(p.name) +
+              '</strong><div class="meta">' +
+              escapeHtml((p.payload && p.payload.o) || "—") +
+              " → " +
+              escapeHtml((p.payload && p.payload.d) || "—") +
+              "</div></div><div>" +
+              '<button type="button" class="btn-sm" data-preset-apply="' +
+              p.id +
+              '">应用</button> ' +
+              '<button type="button" class="btn-sm" data-preset-del="' +
+              p.id +
+              '">删除</button></div></li>'
+            );
+          })
+          .join("");
+      }
+      if (pe) pe.style.display = presets.length ? "none" : "block";
+
+      var alerts = loadJsonStore(STORAGE_ALERTS, []);
+      var al = document.getElementById("alert-list");
+      var ae = document.getElementById("alert-empty");
+      if (al) {
+        al.innerHTML = alerts
+          .map(function (a) {
+            return (
+              '<li class="alert-item"><div><strong>¥' +
+              a.maxYuan +
+              " 内</strong> · " +
+              escapeHtml(a.origin) +
+              " → " +
+              escapeHtml(a.dest) +
+              '<div class="meta">出发日 ' +
+              escapeHtml(a.departIso) +
+              (a.retIso ? " · 返程 " + escapeHtml(a.retIso) : "") +
+              "</div></div>" +
+              '<button type="button" class="btn-sm" data-alert-del="' +
+              a.id +
+              '">删除</button></li>'
+            );
+          })
+          .join("");
+      }
+      if (ae) ae.style.display = alerts.length ? "none" : "block";
+    }
+
+    var alertToastCooldownUntil = {};
+
+    function checkPriceAlertsDemo() {
+      var alerts = loadJsonStore(STORAGE_ALERTS, []);
+      if (!alerts.length) return;
+      var now = Date.now();
+      alerts.forEach(function (a) {
+        var list = MOCK_FLIGHTS.filter(function (f) {
+          return matchesCityOrCode(f.origin, f.fromCode, a.origin) && matchesCityOrCode(f.dest, f.toCode, a.dest);
+        });
+        if (!list.length) return;
+        var min = Infinity;
+        list.forEach(function (f) {
+          var p = tripPriceForAlert(f, a);
+          if (p < min) min = p;
+        });
+        if (min <= a.maxYuan) {
+          var until = alertToastCooldownUntil[a.id] || 0;
+          if (now < until) return;
+          alertToastCooldownUntil[a.id] = now + 120000;
+          showToast(
+            "【低价提醒·演示】" +
+              a.origin +
+              "→" +
+              a.dest +
+              " " +
+              a.departIso +
+              " 演示起价约 ¥" +
+              min +
+              "（目标 ≤¥" +
+              a.maxYuan +
+              "）",
+            6200
+          );
+        }
+      });
     }
 
     function uniqueAirlines() {
@@ -3103,8 +3673,7 @@
       el.setAttribute("datetime", n.toISOString());
     }
 
-    function computeFareBreakdown(f) {
-      var total = effectivePrice(f);
+    function computeFareBreakdownFromTotal(total) {
       var ticket = Math.round(total * 0.76);
       var tax = Math.round(total * 0.14);
       var fuel = Math.max(0, total - ticket - tax);
@@ -3114,9 +3683,9 @@
     function openPriceModal(f) {
       var modal = document.getElementById("price-modal");
       var body = document.getElementById("price-modal-body");
-      var br = computeFareBreakdown(f);
-      var one = effectivePrice(f);
+      var one = priceForDepartDate(f, getSelectedDepartIso());
       var trip = tripPriceForFilter(f);
+      var br = computeFareBreakdownFromTotal(one);
       var html = "";
       html += "<p><strong>" + escapeHtml(f.airline) + " " + escapeHtml(f.flightNo) + "</strong><br/>";
       html +=
@@ -3132,16 +3701,27 @@
       html += "<div><span>机票款（演示）</span><span>¥" + br.ticket + "</span></div>";
       html += "<div><span>税费/民航发展基金等（演示）</span><span>¥" + br.tax + "</span></div>";
       html += "<div><span>燃油附加（演示）</span><span>¥" + br.fuel + "</span></div>";
-      html += '<div class="total"><span>成人单程应付参考</span><span>¥' + one + "</span></div>";
+      html += '<div class="total"><span>成人单程（按所选出发日演示）</span><span>¥' + one + "</span></div>";
       if (hasReturnDate()) {
+        var retPart = trip - one;
+        html +=
+          '<div style="display:flex;justify-content:space-between;padding:0.35rem 0;font-size:0.82rem;color:var(--text-muted);border-bottom:1px dashed #e2e8f0;"><span>返程演示参考（约去程×0.91）</span><span>¥' +
+          retPart +
+          "</span></div>";
         html +=
           '<div class="total" style="margin-top:0.35rem;"><span>成人往返演示合计</span><span>¥' +
           trip +
           "</span></div>";
         html +=
-          "<p style=\"font-size:0.78rem;margin:0.5rem 0 0;color:var(--text-muted);\">返程价按去程约 91% 模拟联订优惠，非航空公司实价。</p>";
+          "<p style=\"font-size:0.78rem;margin:0.5rem 0 0;color:var(--text-muted);\">价格为演示算法，不同出发/返程日会浮动；非航司实价。</p>";
       }
       html += "</div>";
+      html +=
+        '<p style="font-size:0.8rem;margin:0.75rem 0 0;line-height:1.45;color:var(--sky-800);"><strong>行李</strong> ' +
+        escapeHtml(f.baggage) +
+        " · <strong>退改</strong> " +
+        escapeHtml(f.refundLabel) +
+        "</p>";
       html +=
         '<p class="modal-disclaimer">金额为界面演示拆分，下单以支付页为准。行李与退改规则以航司客规为准。</p>';
       body.innerHTML = html;
@@ -3157,7 +3737,7 @@
     }
 
     function flightPriceHtml(f) {
-      var one = effectivePrice(f);
+      var one = priceForDepartDate(f, getSelectedDepartIso());
       var total = tripPriceForFilter(f);
       if (!hasReturnDate()) {
         return '<div class="flight-price">¥' + one + '<span style="font-size:0.65rem;font-weight:600;color:var(--text-muted);margin-left:4px;">起</span></div>';
@@ -3165,7 +3745,7 @@
       return (
         '<div class="flight-price">¥' +
         total +
-        '</div><div class="flight-price-note">往返演示总价 · 单程参考 ¥' +
+        '</div><div class="flight-price-note">往返演示总价 · 去程日参考 ¥' +
         one +
         "</div>"
       );
@@ -3263,18 +3843,22 @@
         '<div class="fc-foot">' +
         "<span><strong>" +
         escapeHtml(f.aircraft) +
-        "</strong></span>" +
-        "<span>行李 " +
-        escapeHtml(f.baggage) +
-        "</span>" +
-        "<span>" +
+        "</strong> · " +
         escapeHtml(f.meal) +
         "</span>" +
-        "<span>" +
-        (f.taxIncluded ? "含税价" : "税费已估算") +
-        " · " +
-        (f.refundable ? "可退改" : "退改受限") +
+        '<div class="fc-policy-pills">' +
+        '<span class="policy-pill">' +
+        (f.taxIncluded ? "含税演示价" : "税费估算") +
         "</span>" +
+        '<span class="policy-pill policy-pill--' +
+        (f.refundable ? "ok" : "warn") +
+        '">' +
+        escapeHtml(f.refundLabel) +
+        "</span>" +
+        '<span class="policy-pill">行李 ' +
+        escapeHtml(f.baggage) +
+        "</span>" +
+        "</div>" +
         badgeHtml +
         "</div>" +
         "</div>" +
@@ -3501,14 +4085,14 @@
 
     function buildEmptySearchHtml() {
       const ids = [...MOCK_FLIGHTS]
-        .sort((a, b) => effectivePrice(a) - effectivePrice(b))
+        .sort((a, b) => tripPriceForFilter(a) - tripPriceForFilter(b))
         .slice(0, 3)
         .map((x) => x.id);
       const btns = ids
         .map((id) => {
           const fl = getFlightById(id);
           if (!fl) return "";
-          return `<button type="button" class="btn-sm" data-suggest-id="${escapeHtml(fl.id)}">${escapeHtml(fl.origin)}→${escapeHtml(fl.dest)} ¥${effectivePrice(fl)}起</button>`;
+          return `<button type="button" class="btn-sm" data-suggest-id="${escapeHtml(fl.id)}">${escapeHtml(fl.origin)}→${escapeHtml(fl.dest)} ¥${tripPriceForFilter(fl)}起</button>`;
         })
         .join("");
       return (
@@ -3583,6 +4167,7 @@
       }
       updateSearchMetaLine();
       updateResultPriceHint();
+      renderPriceCalendar();
       touchUpdatedLabel();
       tickHeaderClock();
       if (!urlOpts.skipUrl) {
@@ -3739,7 +4324,7 @@
     }
 
     // ---------- 导航切换（含地址栏 #hash、无障碍） ----------
-    const PANEL_KEYS = ["home", "search", "explore", "saved", "rules"];
+    const PANEL_KEYS = ["home", "search", "explore", "alerts", "saved", "rules"];
 
     function switchPanel(id, opts) {
       const options = opts || {};
@@ -3765,6 +4350,9 @@
       if (id === "saved") {
         renderFavorites();
         renderCompareTable();
+      }
+      if (id === "alerts") {
+        renderAlertsPanel();
       }
       window.scrollTo(0, 0);
     }
@@ -4075,6 +4663,115 @@
       scheduleSearchImmediate(true);
     });
 
+    document.getElementById("price-calendar-strip").addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-cal-iso]");
+      if (!btn) return;
+      var iso = btn.getAttribute("data-cal-iso");
+      if (!iso) return;
+      document.getElementById("q-depart").value = iso;
+      scheduleSearchImmediate(true);
+      showToast("已切换出发日为 " + iso);
+    });
+
+    document.getElementById("btn-save-preset").addEventListener("click", function () {
+      var nameInp = document.getElementById("preset-name-input");
+      var name = (nameInp && nameInp.value) || "";
+      name = name.trim();
+      if (!name) {
+        showToast("请输入方案名称");
+        return;
+      }
+      var presets = loadJsonStore(STORAGE_PRESETS, []);
+      presets.unshift({
+        id: String(Date.now()) + "_" + Math.random().toString(36).slice(2, 6),
+        name: name,
+        payload: capturePresetPayload(),
+      });
+      saveJsonStore(STORAGE_PRESETS, presets);
+      nameInp.value = "";
+      renderAlertsPanel();
+      showToast("已保存方案「" + name + "」");
+    });
+
+    document.getElementById("btn-goto-alerts").addEventListener("click", function () {
+      switchPanel("alerts");
+    });
+
+    document.getElementById("btn-add-alert").addEventListener("click", function () {
+      var o = document.getElementById("q-origin").value.trim();
+      var d = document.getElementById("q-dest").value.trim();
+      var dep = document.getElementById("q-depart").value.trim();
+      var maxRaw = document.getElementById("alert-max-yuan").value;
+      var maxYuan = parseInt(maxRaw, 10);
+      if (!o || !d) {
+        showToast("请先在「搜索机票」填写出发地与目的地");
+        return;
+      }
+      if (!dep) {
+        showToast("请选择出发日期");
+        return;
+      }
+      if (isNaN(maxYuan) || maxYuan < 100) {
+        showToast("请输入合理的目标价上限（整数，≥100）");
+        return;
+      }
+      var item = {
+        id: String(Date.now()) + "_" + Math.random().toString(36).slice(2, 7),
+        origin: o,
+        dest: d,
+        departIso: dep,
+        maxYuan: maxYuan,
+      };
+      if (hasReturnDate()) {
+        item.retIso = document.getElementById("q-return").value.trim();
+      }
+      var alerts = loadJsonStore(STORAGE_ALERTS, []);
+      alerts.push(item);
+      saveJsonStore(STORAGE_ALERTS, alerts);
+      renderAlertsPanel();
+      showToast("已添加低价提醒（演示，约每 45 秒检测一次）");
+    });
+
+    document.getElementById("preset-list").addEventListener("click", function (e) {
+      var ap = e.target.closest("[data-preset-apply]");
+      var del = e.target.closest("[data-preset-del]");
+      if (!ap && !del) return;
+      var id = (ap || del).getAttribute(ap ? "data-preset-apply" : "data-preset-del");
+      var presets = loadJsonStore(STORAGE_PRESETS, []);
+      if (del) {
+        presets = presets.filter(function (p) {
+          return p.id !== id;
+        });
+        saveJsonStore(STORAGE_PRESETS, presets);
+        renderAlertsPanel();
+        showToast("已删除方案");
+        return;
+      }
+      var found = presets.filter(function (p) {
+        return p.id === id;
+      })[0];
+      if (!found || !found.payload) {
+        showToast("方案数据无效");
+        return;
+      }
+      applyPresetPayload(found.payload);
+      switchPanel("search");
+      scheduleSearchImmediate(true);
+      showToast("已应用方案「" + found.name + "」");
+    });
+
+    document.getElementById("alert-list").addEventListener("click", function (e) {
+      var del = e.target.closest("[data-alert-del]");
+      if (!del) return;
+      var id = del.getAttribute("data-alert-del");
+      var alerts = loadJsonStore(STORAGE_ALERTS, []).filter(function (a) {
+        return a.id !== id;
+      });
+      saveJsonStore(STORAGE_ALERTS, alerts);
+      renderAlertsPanel();
+      showToast("已删除提醒");
+    });
+
     // ---------- 启动 ----------
     fillAirlineSelect();
     initDates();
@@ -4093,8 +4790,10 @@
     setLibraryStat();
     updateCompareBar();
     renderCompareTable();
+    renderAlertsPanel();
     tickHeaderClock();
     setInterval(tickHeaderClock, 30000);
+    setInterval(checkPriceAlertsDemo, 45000);
   </script>
 </body>
 </html>
