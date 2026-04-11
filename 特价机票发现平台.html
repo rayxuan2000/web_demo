@@ -485,14 +485,229 @@
       color: white;
     }
 
-    /* ========== 搜索面板 ========== */
+    /* ========== 搜索面板（仿订票站：白卡片 + 分区） ========== */
     .search-panel {
-      background: var(--cloud);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      padding: 1.35rem 1.35rem 1.25rem;
+      background: #eef2f7;
+      border-radius: calc(var(--radius) + 4px);
+      border: 1px solid #e2e8f0;
+      padding: 1rem;
       margin-bottom: 1.35rem;
-      box-shadow: var(--shadow-card);
+      box-shadow: none;
+    }
+
+    .booking-widget {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      padding: 1.25rem 1.35rem 1.2rem;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .booking-widget-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .booking-widget-kicker {
+      margin: 0;
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 500;
+      line-height: 1.4;
+      max-width: 22rem;
+    }
+
+    .booking-widget .trip-seg {
+      margin-bottom: 0;
+      flex-shrink: 0;
+      background: #fff;
+    }
+
+    .booking-route-block {
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1rem 1rem 1.05rem;
+      margin-bottom: 0;
+    }
+
+    .booking-route-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 0.65rem 0.85rem;
+      align-items: end;
+    }
+
+    @media (max-width: 640px) {
+      .booking-route-row {
+        grid-template-columns: 1fr;
+        justify-items: stretch;
+      }
+
+      .booking-route-row .btn-swap {
+        justify-self: center;
+        order: 2;
+      }
+
+      .booking-route-row .booking-airport-field:first-of-type {
+        order: 1;
+      }
+
+      .booking-route-row .booking-airport-field:last-of-type {
+        order: 3;
+      }
+    }
+
+    .booking-airport-field .field label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+    }
+
+    .booking-block .field label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .booking-airport-field .field input {
+      padding: 0.7rem 0.85rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border-color: #cbd5e1;
+      background: #fff;
+    }
+
+    .booking-route-row .btn-swap {
+      width: 44px;
+      height: 44px;
+      align-self: center;
+      margin-bottom: 0.15rem;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+
+    .booking-block {
+      margin-top: 1.15rem;
+      padding-top: 1.15rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .booking-block-title {
+      margin: 0 0 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: 0.02em;
+    }
+
+    .booking-hot-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1.5rem;
+    }
+
+    @media (max-width: 700px) {
+      .booking-hot-two {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .booking-hot-two .chips-label {
+      margin-bottom: 0.3rem;
+    }
+
+    .booking-hot-two .chip-row {
+      margin-bottom: 0;
+    }
+
+    .booking-dates-budget {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem 1.15rem;
+    }
+
+    @media (max-width: 540px) {
+      .booking-dates-budget {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .booking-dates-budget .field input,
+    .booking-dates-budget .field select {
+      padding: 0.55rem 0.7rem;
+      border-radius: 10px;
+      border-color: #cbd5e1;
+    }
+
+    .booking-dates-budget .field-hint {
+      margin-top: 0.35rem;
+      font-size: 0.68rem;
+    }
+
+    .booking-date-quick {
+      margin-top: 0.4rem;
+    }
+
+    .booking-filters-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 0.65rem 1.35rem;
+    }
+
+    .booking-filter-select {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.3rem;
+      min-width: 7.5rem;
+    }
+
+    .booking-filter-select > span {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.03em;
+    }
+
+    .booking-filter-select select {
+      width: 100%;
+      min-width: 7rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 8px;
+      border-color: #cbd5e1;
+      font-size: 0.85rem;
+    }
+
+    .booking-filter-check {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.84rem;
+      color: #334155;
+      font-weight: 500;
+      min-height: 2.35rem;
+    }
+
+    .booking-widget-footer {
+      margin-top: 1.15rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .booking-widget-footer .search-actions-row {
+      margin-top: 0;
+      justify-content: flex-end;
     }
 
     .form-grid {
@@ -1869,88 +2084,117 @@
       <h2 class="section-title">搜索机票</h2>
       <p class="panel-lead">筛选、排序、价格明细、收藏与对比均作用于下方列表；切换单程/往返后价格与预算逻辑同步变化。</p>
       <div class="search-panel">
-        <div class="trip-seg" role="group" aria-label="行程类型">
-          <button type="button" id="trip-oneway" aria-pressed="false">
-            <span class="trip-seg-glyph" aria-hidden="true">→</span>单程
-          </button>
-          <button type="button" id="trip-round" aria-pressed="true">
-            <span class="trip-seg-glyph" aria-hidden="true">⇄</span>往返
-          </button>
-        </div>
-        <div class="od-row">
-          <div class="field" style="margin:0;">
-            <label for="q-origin" id="label-q-origin">出发城市 / 机场</label>
-            <input type="text" id="q-origin" placeholder="如：上海、PVG" autocomplete="off" />
-          </div>
-          <button type="button" class="btn-swap btn-swap--round" id="btn-swap-od" title="交换出发地与目的地" aria-label="交换出发地与目的地">
-            <span class="swap-glyph" aria-hidden="true">⇄</span>
-          </button>
-          <div class="field" style="margin:0;">
-            <label for="q-dest" id="label-q-dest">到达城市 / 机场</label>
-            <input type="text" id="q-dest" placeholder="如：大阪、KIX" autocomplete="off" />
-          </div>
-        </div>
-        <p class="chips-label" id="chips-label-origins">热门出发（演示）</p>
-        <div class="chip-row" id="chip-origins" aria-label="热门出发城市"></div>
-        <p class="chips-label" id="chips-label-dests">热门目的地（演示）</p>
-        <div class="chip-row" id="chip-dests" aria-label="热门目的地城市"></div>
-        <div class="form-grid">
-          <div class="field">
-            <label for="q-depart" id="label-q-depart">出发日期</label>
-            <input type="date" id="q-depart" />
-            <div class="date-quick" role="group" aria-label="出发日期快捷选择">
-              <button type="button" data-date-offset="0">今天</button>
-              <button type="button" data-date-offset="3">三天后</button>
-              <button type="button" data-date-offset="7">一周后</button>
+        <div class="booking-widget" aria-label="机票搜索与筛选">
+          <header class="booking-widget-head">
+            <p class="booking-widget-kicker">修改任意项后列表会自动刷新；与常见订票站一致，按「行程 → 日期预算 → 偏好」分区填写即可。</p>
+            <div class="trip-seg" role="group" aria-label="行程类型">
+              <button type="button" id="trip-oneway" aria-pressed="false">
+                <span class="trip-seg-glyph" aria-hidden="true">→</span>单程
+              </button>
+              <button type="button" id="trip-round" aria-pressed="true">
+                <span class="trip-seg-glyph" aria-hidden="true">⇄</span>往返
+              </button>
+            </div>
+          </header>
+
+          <div class="booking-route-block">
+            <div class="booking-route-row">
+              <div class="booking-airport-field field" style="margin:0;">
+                <label for="q-origin" id="label-q-origin">出发城市 / 机场</label>
+                <input type="text" id="q-origin" placeholder="城市名或机场代码，如 上海、PVG" autocomplete="off" />
+              </div>
+              <button type="button" class="btn-swap btn-swap--round" id="btn-swap-od" title="交换出发地与目的地" aria-label="交换出发地与目的地">
+                <span class="swap-glyph" aria-hidden="true">⇄</span>
+              </button>
+              <div class="booking-airport-field field" style="margin:0;">
+                <label for="q-dest" id="label-q-dest">到达城市 / 机场</label>
+                <input type="text" id="q-dest" placeholder="城市名或机场代码，如 大阪、KIX" autocomplete="off" />
+              </div>
             </div>
           </div>
-          <div class="field">
-            <label for="q-return" id="label-q-return">返程日期</label>
-            <input type="date" id="q-return" aria-describedby="hint-return" />
-            <p class="field-hint" id="hint-return">往返模式下会按「去+返」演示总价展示与筛选；单程时忽略返程。</p>
-          </div>
-          <div class="field">
-            <label for="q-budget-min">预算下限（元）</label>
-            <input type="number" id="q-budget-min" placeholder="0" min="0" />
-          </div>
-          <div class="field">
-            <label for="q-budget-max">预算上限（元）</label>
-            <input type="number" id="q-budget-max" placeholder="不限" min="0" />
-          </div>
-        </div>
-        <div class="filters-row">
-          <label class="filter-group">
-            <input type="checkbox" id="f-direct" />
-            仅直飞
-          </label>
-          <label class="filter-group">
-            <span>航司</span>
-            <select id="f-airline">
-              <option value="">全部</option>
-            </select>
-          </label>
-          <label class="filter-group">
-            <span>最长飞行</span>
-            <select id="f-max-hours">
-              <option value="">不限</option>
-              <option value="3">≤3 小时</option>
-              <option value="5">≤5 小时</option>
-              <option value="8">≤8 小时</option>
-              <option value="12">≤12 小时</option>
-            </select>
-          </label>
-          <label class="filter-group">
-            <input type="checkbox" id="f-tax" checked />
-            含税价
-          </label>
-          <label class="filter-group">
-            <input type="checkbox" id="f-refund" />
-            可退改
-          </label>
-        </div>
-        <div class="search-actions-row">
-          <button type="button" class="btn btn-primary" id="btn-reset-filters">重置条件</button>
-          <button type="button" class="btn btn-secondary" id="btn-clear-filters">快速清空筛选</button>
+
+          <section class="booking-block" aria-label="热门城市">
+            <h3 class="booking-block-title">热门城市 · 一键填入（演示）</h3>
+            <div class="booking-hot-two">
+              <div>
+                <p class="chips-label" id="chips-label-origins">出发</p>
+                <div class="chip-row" id="chip-origins" aria-label="热门出发城市"></div>
+              </div>
+              <div>
+                <p class="chips-label" id="chips-label-dests">到达</p>
+                <div class="chip-row" id="chip-dests" aria-label="热门目的地城市"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="booking-block" aria-label="日期与预算">
+            <h3 class="booking-block-title">出发日期 · 返程 · 预算（元）</h3>
+            <div class="booking-dates-budget">
+              <div class="field" style="margin:0;">
+                <label for="q-depart" id="label-q-depart">出发日期</label>
+                <input type="date" id="q-depart" />
+                <div class="date-quick booking-date-quick" role="group" aria-label="出发日期快捷选择">
+                  <button type="button" data-date-offset="0">今天</button>
+                  <button type="button" data-date-offset="3">三天后</button>
+                  <button type="button" data-date-offset="7">一周后</button>
+                </div>
+              </div>
+              <div class="field" style="margin:0;">
+                <label for="q-return" id="label-q-return">返程日期</label>
+                <input type="date" id="q-return" aria-describedby="hint-return" />
+                <p class="field-hint" id="hint-return">往返模式下会按「去+返」演示总价展示与筛选；单程时忽略返程。</p>
+              </div>
+              <div class="field" style="margin:0;">
+                <label for="q-budget-min">预算下限</label>
+                <input type="number" id="q-budget-min" placeholder="0" min="0" />
+              </div>
+              <div class="field" style="margin:0;">
+                <label for="q-budget-max">预算上限</label>
+                <input type="number" id="q-budget-max" placeholder="不限" min="0" />
+              </div>
+            </div>
+          </section>
+
+          <section class="booking-block" aria-label="航班偏好">
+            <h3 class="booking-block-title">航班偏好</h3>
+            <div class="booking-filters-grid" role="group">
+              <label class="filter-group booking-filter-check">
+                <input type="checkbox" id="f-direct" />
+                仅直飞
+              </label>
+              <label class="filter-group booking-filter-select">
+                <span>承运航司</span>
+                <select id="f-airline">
+                  <option value="">全部航司</option>
+                </select>
+              </label>
+              <label class="filter-group booking-filter-select">
+                <span>最长飞行时间</span>
+                <select id="f-max-hours">
+                  <option value="">不限</option>
+                  <option value="3">≤3 小时</option>
+                  <option value="5">≤5 小时</option>
+                  <option value="8">≤8 小时</option>
+                  <option value="12">≤12 小时</option>
+                </select>
+              </label>
+              <label class="filter-group booking-filter-check">
+                <input type="checkbox" id="f-tax" checked />
+                含税价
+              </label>
+              <label class="filter-group booking-filter-check">
+                <input type="checkbox" id="f-refund" />
+                可退改
+              </label>
+            </div>
+          </section>
+
+          <footer class="booking-widget-footer">
+            <div class="search-actions-row">
+              <button type="button" class="btn btn-primary" id="btn-reset-filters">恢复默认条件</button>
+              <button type="button" class="btn btn-secondary" id="btn-clear-filters">清空城市与筛选</button>
+            </div>
+          </footer>
         </div>
       </div>
 
@@ -3261,7 +3505,7 @@
         '<p class="fav-empty" style="display:block;border-style:solid;">没有符合条件的航班，可尝试放宽预算、取消「仅直飞」或清空出发地/目的地。</p>' +
         '<div class="empty-suggest">' +
         "<h4>试试这些低价方向（一键填入）</h4>" +
-        '<p class="field-hint" style="margin-bottom:0.75rem;">也可点下方「快速清空筛选」只保留日期、快速放宽条件。</p>' +
+        '<p class="field-hint" style="margin-bottom:0.75rem;">也可点下方「清空城市与筛选」只保留日期、快速放宽条件。</p>' +
         '<div class="empty-suggest-actions">' +
         btns +
         "</div></div>"
