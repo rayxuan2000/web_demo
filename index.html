@@ -533,6 +533,14 @@
       box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
     }
 
+    .field input:disabled,
+    .field select:disabled {
+      background: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+      border-color: #e2e8f0;
+    }
+
     .filters-row {
       display: flex;
       flex-wrap: wrap;
@@ -1147,6 +1155,21 @@
       cursor: pointer;
       color: var(--text-muted);
       transition: background var(--transition), color var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    .trip-seg-glyph {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1;
+      opacity: 0.88;
+    }
+
+    .trip-seg button[aria-pressed="true"] .trip-seg-glyph {
+      opacity: 1;
     }
 
     .trip-seg button[aria-pressed="true"] {
@@ -1191,6 +1214,23 @@
     .btn-swap:hover {
       background: var(--sky-100);
       transform: rotate(180deg);
+    }
+
+    .btn-swap--oneway:hover {
+      transform: scaleX(-1);
+    }
+
+    .btn-swap .swap-glyph {
+      display: inline-block;
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--sky-800);
+    }
+
+    .btn-swap--round .swap-glyph {
+      font-size: 1.05rem;
+      font-weight: 600;
     }
 
     .btn-swap:focus-visible {
@@ -1789,27 +1829,33 @@
       <p class="panel-lead">筛选、排序、价格明细、收藏与对比均作用于下方列表；切换单程/往返后价格与预算逻辑同步变化。</p>
       <div class="search-panel">
         <div class="trip-seg" role="group" aria-label="行程类型">
-          <button type="button" id="trip-oneway" aria-pressed="false">单程</button>
-          <button type="button" id="trip-round" aria-pressed="true">往返</button>
+          <button type="button" id="trip-oneway" aria-pressed="false">
+            <span class="trip-seg-glyph" aria-hidden="true">→</span>单程
+          </button>
+          <button type="button" id="trip-round" aria-pressed="true">
+            <span class="trip-seg-glyph" aria-hidden="true">⇄</span>往返
+          </button>
         </div>
         <div class="od-row">
           <div class="field" style="margin:0;">
-            <label for="q-origin">出发城市 / 机场</label>
+            <label for="q-origin" id="label-q-origin">出发城市 / 机场</label>
             <input type="text" id="q-origin" placeholder="如：上海、PVG" autocomplete="off" />
           </div>
-          <button type="button" class="btn-swap" id="btn-swap-od" title="交换出发地与目的地" aria-label="交换出发地与目的地">⇄</button>
+          <button type="button" class="btn-swap btn-swap--round" id="btn-swap-od" title="交换出发地与目的地" aria-label="交换出发地与目的地">
+            <span class="swap-glyph" aria-hidden="true">⇄</span>
+          </button>
           <div class="field" style="margin:0;">
-            <label for="q-dest">到达城市 / 机场</label>
+            <label for="q-dest" id="label-q-dest">到达城市 / 机场</label>
             <input type="text" id="q-dest" placeholder="如：大阪、KIX" autocomplete="off" />
           </div>
         </div>
-        <p class="chips-label">热门出发（演示）</p>
+        <p class="chips-label" id="chips-label-origins">热门出发（演示）</p>
         <div class="chip-row" id="chip-origins" aria-label="热门出发城市"></div>
-        <p class="chips-label">热门目的地（演示）</p>
+        <p class="chips-label" id="chips-label-dests">热门目的地（演示）</p>
         <div class="chip-row" id="chip-dests" aria-label="热门目的地城市"></div>
         <div class="form-grid">
           <div class="field">
-            <label for="q-depart">出发日期</label>
+            <label for="q-depart" id="label-q-depart">出发日期</label>
             <input type="date" id="q-depart" />
             <div class="date-quick" role="group" aria-label="出发日期快捷选择">
               <button type="button" data-date-offset="0">今天</button>
@@ -1818,7 +1864,7 @@
             </div>
           </div>
           <div class="field">
-            <label for="q-return">返程日期</label>
+            <label for="q-return" id="label-q-return">返程日期</label>
             <input type="date" id="q-return" aria-describedby="hint-return" />
             <p class="field-hint" id="hint-return">往返模式下会按「去+返」演示总价展示与筛选；单程时忽略返程。</p>
           </div>
@@ -1871,7 +1917,7 @@
 
       <div class="results-toolbar">
         <div class="toolbar-left">
-          <p class="result-count">共 <strong id="result-count">0</strong> 个航班方案 <span style="font-weight:400;color:var(--text-muted);">（成人含税演示价）</span></p>
+          <p class="result-count">共 <strong id="result-count">0</strong> 个航班方案 <span id="result-price-hint" style="font-weight:400;color:var(--text-muted);">（成人含税演示价）</span></p>
           <p class="search-meta-line" id="search-meta-line">全国出发 · 全部目的地</p>
           <p class="data-updated" id="data-updated" aria-live="polite"></p>
           <p class="library-stat" id="library-stat" aria-live="polite"></p>
@@ -2344,6 +2390,64 @@
       return parseTimeToMin(f.arrive) < parseTimeToMin(f.depart);
     }
 
+    function updateOdSwapButtonIcon() {
+      var btn = document.getElementById("btn-swap-od");
+      if (!btn) return;
+      var glyph = btn.querySelector(".swap-glyph");
+      if (isRoundTripMode()) {
+        btn.classList.remove("btn-swap--oneway");
+        btn.classList.add("btn-swap--round");
+        if (glyph) glyph.textContent = "⇄";
+        btn.title = "交换出发地与目的地（往返：去程 ⇄ 回程方向）";
+        btn.setAttribute("aria-label", "交换出发地与目的地，往返模式");
+      } else {
+        btn.classList.remove("btn-swap--round");
+        btn.classList.add("btn-swap--oneway");
+        if (glyph) glyph.textContent = "→";
+        btn.title = "交换出发地与目的地（单程：仅对调城市）";
+        btn.setAttribute("aria-label", "交换出发地与目的地，单程模式");
+      }
+    }
+
+    /** 与单程/往返联动的表单文案（标签、说明、热门 chip 标题） */
+    function updateTripDependentFormLabels() {
+      var lo = document.getElementById("label-q-origin");
+      var ld = document.getElementById("label-q-dest");
+      var ldep = document.getElementById("label-q-depart");
+      var lret = document.getElementById("label-q-return");
+      var hint = document.getElementById("hint-return");
+      var co = document.getElementById("chips-label-origins");
+      var cd = document.getElementById("chips-label-dests");
+      var chipO = document.getElementById("chip-origins");
+      var chipD = document.getElementById("chip-dests");
+      if (isRoundTripMode()) {
+        if (lo) lo.textContent = "去程 · 出发城市 / 机场";
+        if (ld) ld.textContent = "去程 · 到达城市 / 机场";
+        if (ldep) ldep.textContent = "去程日期";
+        if (lret) lret.textContent = "返程日期";
+        if (hint) {
+          hint.textContent =
+            "已选返程后将按「去程+返程」演示总价展示列表与卡片大价，并参与预算上下限筛选。";
+        }
+        if (co) co.textContent = "热门去程出发（演示）";
+        if (cd) cd.textContent = "热门去程到达（演示）";
+        if (chipO) chipO.setAttribute("aria-label", "热门去程出发城市");
+        if (chipD) chipD.setAttribute("aria-label", "热门去程到达城市");
+      } else {
+        if (lo) lo.textContent = "出发城市 / 机场";
+        if (ld) ld.textContent = "到达城市 / 机场";
+        if (ldep) ldep.textContent = "出发日期";
+        if (lret) lret.textContent = "返程日期（单程不适用）";
+        if (hint) {
+          hint.textContent = "单程不统计返程；切换到「往返」后可选择返程日期，并按双程演示总价筛选。";
+        }
+        if (co) co.textContent = "热门出发（演示）";
+        if (cd) cd.textContent = "热门目的地（演示）";
+        if (chipO) chipO.setAttribute("aria-label", "热门出发城市");
+        if (chipD) chipD.setAttribute("aria-label", "热门目的地城市");
+      }
+    }
+
     function syncTripModeUi() {
       var ret = document.getElementById("q-return");
       if (!ret) return;
@@ -2353,6 +2457,23 @@
         ret.disabled = true;
         ret.value = "";
       }
+      updateTripDependentFormLabels();
+      updateOdSwapButtonIcon();
+    }
+
+    function updateResultPriceHint() {
+      var el = document.getElementById("result-price-hint");
+      if (!el) return;
+      if (!isRoundTripMode()) {
+        el.textContent = "（成人单程含税演示价）";
+        return;
+      }
+      var ret = document.getElementById("q-return");
+      if (ret && !ret.value) {
+        el.textContent = "（含税演示；选定返程后列表将按往返双程总价展示与筛选）";
+        return;
+      }
+      el.textContent = "（往返：列表价为双程演示总价，含税演示）";
     }
 
     /**
@@ -2649,7 +2770,7 @@
       var ret = document.getElementById("q-return").value;
       var parts = [];
       parts.push((o || "全国") + " → " + (d || "各地"));
-      if (dep) parts.push(formatChineseDate(dep) + " 去程");
+      if (dep) parts.push(formatChineseDate(dep) + (isRoundTripMode() ? " 去程" : " 出发"));
       if (isRoundTripMode()) {
         parts.push(ret ? formatChineseDate(ret) + " 返程" : "待选返程");
       }
@@ -3153,6 +3274,7 @@
         }
       }
       updateSearchMetaLine();
+      updateResultPriceHint();
       touchUpdatedLabel();
       tickHeaderClock();
       if (!urlOpts.skipUrl) {
