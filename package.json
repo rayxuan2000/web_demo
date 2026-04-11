@@ -1,0 +1,12 @@
+{
+  "name": "meituan",
+  "private": true,
+  "description": "特价机票发现平台单页 + 本地冒烟脚本",
+  "scripts": {
+    "smoke": "node smoke-playwright.mjs",
+    "serve": "npx --yes serve -l 8765 ."
+  },
+  "devDependencies": {
+    "playwright": "1.49.1"
+  }
+}
