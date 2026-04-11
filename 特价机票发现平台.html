@@ -490,126 +490,9 @@
       background: var(--cloud);
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      padding: 1.25rem 1.35rem 1.15rem;
+      padding: 1.35rem 1.35rem 1.25rem;
       margin-bottom: 1.35rem;
       box-shadow: var(--shadow-card);
-    }
-
-    .search-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    /* 宽屏：左行程+城市，右日期与预算 */
-    .search-top-band {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
-      gap: 1rem 1.5rem;
-      align-items: end;
-    }
-
-    @media (max-width: 900px) {
-      .search-top-band {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .search-top-left .trip-seg {
-      margin-bottom: 0.55rem;
-    }
-
-    .search-top-left .od-row {
-      margin-bottom: 0;
-    }
-
-    .search-fields-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem 1rem;
-    }
-
-    @media (max-width: 520px) {
-      .search-fields-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .search-chips-band {
-      padding-top: 0.65rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .chips-split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem 1.25rem;
-    }
-
-    @media (max-width: 720px) {
-      .chips-split {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .chips-split .chip-row {
-      margin-bottom: 0;
-    }
-
-    .chips-split .chips-label {
-      margin-bottom: 0.3rem;
-    }
-
-    .date-field-inline {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.45rem;
-    }
-
-    .date-field-inline input[type="date"] {
-      flex: 1 1 9.5rem;
-      min-width: 0;
-      width: auto;
-    }
-
-    .date-field-inline .date-quick {
-      margin-top: 0;
-      flex: 0 1 auto;
-    }
-
-    .field--return .field-hint {
-      margin-top: 0.25rem;
-    }
-
-    .search-filters-band {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem 1rem;
-      padding-top: 0.75rem;
-      border-top: 1px dashed var(--border);
-    }
-
-    .filters-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.6rem 1.1rem;
-      flex: 1;
-      min-width: min(100%, 200px);
-    }
-
-    .filters-toolbar .filter-group--airline select {
-      min-width: 7.5rem;
-    }
-
-    .search-actions-inline {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      flex-shrink: 0;
     }
 
     .form-grid {
@@ -1986,108 +1869,88 @@
       <h2 class="section-title">搜索机票</h2>
       <p class="panel-lead">筛选、排序、价格明细、收藏与对比均作用于下方列表；切换单程/往返后价格与预算逻辑同步变化。</p>
       <div class="search-panel">
-        <div class="search-layout">
-          <div class="search-top-band">
-            <div class="search-top-left">
-              <div class="trip-seg" role="group" aria-label="行程类型">
-                <button type="button" id="trip-oneway" aria-pressed="false">
-                  <span class="trip-seg-glyph" aria-hidden="true">→</span>单程
-                </button>
-                <button type="button" id="trip-round" aria-pressed="true">
-                  <span class="trip-seg-glyph" aria-hidden="true">⇄</span>往返
-                </button>
-              </div>
-              <div class="od-row">
-                <div class="field" style="margin:0;">
-                  <label for="q-origin" id="label-q-origin">出发城市 / 机场</label>
-                  <input type="text" id="q-origin" placeholder="如：上海、PVG" autocomplete="off" />
-                </div>
-                <button type="button" class="btn-swap btn-swap--round" id="btn-swap-od" title="交换出发地与目的地" aria-label="交换出发地与目的地">
-                  <span class="swap-glyph" aria-hidden="true">⇄</span>
-                </button>
-                <div class="field" style="margin:0;">
-                  <label for="q-dest" id="label-q-dest">到达城市 / 机场</label>
-                  <input type="text" id="q-dest" placeholder="如：大阪、KIX" autocomplete="off" />
-                </div>
-              </div>
-            </div>
-            <div class="search-fields-grid" aria-label="日期与预算">
-              <div class="field">
-                <label for="q-depart" id="label-q-depart">出发日期</label>
-                <div class="date-field-inline">
-                  <input type="date" id="q-depart" />
-                  <div class="date-quick" role="group" aria-label="出发日期快捷选择">
-                    <button type="button" data-date-offset="0">今天</button>
-                    <button type="button" data-date-offset="3">三天后</button>
-                    <button type="button" data-date-offset="7">一周后</button>
-                  </div>
-                </div>
-              </div>
-              <div class="field field--return">
-                <label for="q-return" id="label-q-return">返程日期</label>
-                <input type="date" id="q-return" aria-describedby="hint-return" />
-                <p class="field-hint" id="hint-return">往返模式下会按「去+返」演示总价展示与筛选；单程时忽略返程。</p>
-              </div>
-              <div class="field">
-                <label for="q-budget-min">预算下限（元）</label>
-                <input type="number" id="q-budget-min" placeholder="0" min="0" />
-              </div>
-              <div class="field">
-                <label for="q-budget-max">预算上限（元）</label>
-                <input type="number" id="q-budget-max" placeholder="不限" min="0" />
-              </div>
+        <div class="trip-seg" role="group" aria-label="行程类型">
+          <button type="button" id="trip-oneway" aria-pressed="false">
+            <span class="trip-seg-glyph" aria-hidden="true">→</span>单程
+          </button>
+          <button type="button" id="trip-round" aria-pressed="true">
+            <span class="trip-seg-glyph" aria-hidden="true">⇄</span>往返
+          </button>
+        </div>
+        <div class="od-row">
+          <div class="field" style="margin:0;">
+            <label for="q-origin" id="label-q-origin">出发城市 / 机场</label>
+            <input type="text" id="q-origin" placeholder="如：上海、PVG" autocomplete="off" />
+          </div>
+          <button type="button" class="btn-swap btn-swap--round" id="btn-swap-od" title="交换出发地与目的地" aria-label="交换出发地与目的地">
+            <span class="swap-glyph" aria-hidden="true">⇄</span>
+          </button>
+          <div class="field" style="margin:0;">
+            <label for="q-dest" id="label-q-dest">到达城市 / 机场</label>
+            <input type="text" id="q-dest" placeholder="如：大阪、KIX" autocomplete="off" />
+          </div>
+        </div>
+        <p class="chips-label" id="chips-label-origins">热门出发（演示）</p>
+        <div class="chip-row" id="chip-origins" aria-label="热门出发城市"></div>
+        <p class="chips-label" id="chips-label-dests">热门目的地（演示）</p>
+        <div class="chip-row" id="chip-dests" aria-label="热门目的地城市"></div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="q-depart" id="label-q-depart">出发日期</label>
+            <input type="date" id="q-depart" />
+            <div class="date-quick" role="group" aria-label="出发日期快捷选择">
+              <button type="button" data-date-offset="0">今天</button>
+              <button type="button" data-date-offset="3">三天后</button>
+              <button type="button" data-date-offset="7">一周后</button>
             </div>
           </div>
-
-          <div class="search-chips-band">
-            <div class="chips-split">
-              <div class="chips-col">
-                <p class="chips-label" id="chips-label-origins">热门出发（演示）</p>
-                <div class="chip-row" id="chip-origins" aria-label="热门出发城市"></div>
-              </div>
-              <div class="chips-col">
-                <p class="chips-label" id="chips-label-dests">热门目的地（演示）</p>
-                <div class="chip-row" id="chip-dests" aria-label="热门目的地城市"></div>
-              </div>
-            </div>
+          <div class="field">
+            <label for="q-return" id="label-q-return">返程日期</label>
+            <input type="date" id="q-return" aria-describedby="hint-return" />
+            <p class="field-hint" id="hint-return">往返模式下会按「去+返」演示总价展示与筛选；单程时忽略返程。</p>
           </div>
-
-          <div class="search-filters-band">
-            <div class="filters-toolbar" role="group" aria-label="更多筛选">
-              <label class="filter-group">
-                <input type="checkbox" id="f-direct" />
-                仅直飞
-              </label>
-              <label class="filter-group filter-group--airline">
-                <span>航司</span>
-                <select id="f-airline">
-                  <option value="">全部</option>
-                </select>
-              </label>
-              <label class="filter-group">
-                <span>最长飞行</span>
-                <select id="f-max-hours">
-                  <option value="">不限</option>
-                  <option value="3">≤3 小时</option>
-                  <option value="5">≤5 小时</option>
-                  <option value="8">≤8 小时</option>
-                  <option value="12">≤12 小时</option>
-                </select>
-              </label>
-              <label class="filter-group">
-                <input type="checkbox" id="f-tax" checked />
-                含税价
-              </label>
-              <label class="filter-group">
-                <input type="checkbox" id="f-refund" />
-                可退改
-              </label>
-            </div>
-            <div class="search-actions-inline">
-              <button type="button" class="btn btn-primary" id="btn-reset-filters">重置条件</button>
-              <button type="button" class="btn btn-secondary" id="btn-clear-filters">快速清空筛选</button>
-            </div>
+          <div class="field">
+            <label for="q-budget-min">预算下限（元）</label>
+            <input type="number" id="q-budget-min" placeholder="0" min="0" />
           </div>
+          <div class="field">
+            <label for="q-budget-max">预算上限（元）</label>
+            <input type="number" id="q-budget-max" placeholder="不限" min="0" />
+          </div>
+        </div>
+        <div class="filters-row">
+          <label class="filter-group">
+            <input type="checkbox" id="f-direct" />
+            仅直飞
+          </label>
+          <label class="filter-group">
+            <span>航司</span>
+            <select id="f-airline">
+              <option value="">全部</option>
+            </select>
+          </label>
+          <label class="filter-group">
+            <span>最长飞行</span>
+            <select id="f-max-hours">
+              <option value="">不限</option>
+              <option value="3">≤3 小时</option>
+              <option value="5">≤5 小时</option>
+              <option value="8">≤8 小时</option>
+              <option value="12">≤12 小时</option>
+            </select>
+          </label>
+          <label class="filter-group">
+            <input type="checkbox" id="f-tax" checked />
+            含税价
+          </label>
+          <label class="filter-group">
+            <input type="checkbox" id="f-refund" />
+            可退改
+          </label>
+        </div>
+        <div class="search-actions-row">
+          <button type="button" class="btn btn-primary" id="btn-reset-filters">重置条件</button>
+          <button type="button" class="btn btn-secondary" id="btn-clear-filters">快速清空筛选</button>
         </div>
       </div>
 
