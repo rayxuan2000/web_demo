@@ -1,0 +1,3255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>云航特价 · 发现低价机票</title>
+  <style>
+    /* ========== 设计令牌 ========== */
+    :root {
+      --sky-900: #0c4a6e;
+      --sky-800: #075985;
+      --sky-600: #0284c7;
+      --sky-500: #0ea5e9;
+      --sky-100: #e0f2fe;
+      --sky-50: #f0f9ff;
+      --cloud: #ffffff;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --accent-warm: #f59e0b;
+      --accent-good: #10b981;
+      --shadow: 0 4px 24px rgba(14, 165, 233, 0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --transition: 0.22s ease;
+      --page-max: 1200px;
+      --shadow-card: 0 2px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      .panel,
+      .deal-card,
+      .dest-card,
+      .flight-card,
+      .section-title .tag {
+        animation: none !important;
+        transition: none !important;
+      }
+      .deal-card:hover,
+      .dest-card:hover {
+        transform: none;
+      }
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: linear-gradient(165deg, var(--sky-50) 0%, #f8fafc 45%, #eef6ff 100%);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    a {
+      color: var(--sky-600);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ========== 顶栏导航 ========== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .header-inner {
+      max-width: var(--page-max);
+      margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: var(--sky-900);
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: inherit;
+      padding: 0;
+    }
+
+    .logo:focus-visible {
+      outline: 2px solid var(--sky-500);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--sky-500), var(--sky-800));
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 1.1rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-tab {
+      border: none;
+      background: transparent;
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      font-family: inherit;
+    }
+
+    .nav-tab:hover {
+      background: var(--sky-100);
+      color: var(--sky-800);
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, var(--sky-500), var(--sky-600));
+      color: white;
+      font-weight: 600;
+    }
+
+    .nav-tab:focus-visible {
+      outline: 2px solid var(--sky-500);
+      outline-offset: 2px;
+    }
+
+    .header-badge {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ========== 主容器 ========== */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0.5rem;
+      z-index: 200;
+      padding: 0.5rem 1rem;
+      background: var(--sky-800);
+      color: white;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .skip-link:focus {
+      left: 0.5rem;
+      outline: 2px solid var(--sky-500);
+      outline-offset: 2px;
+    }
+
+    .main {
+      max-width: var(--page-max);
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+      transition: padding-bottom var(--transition);
+    }
+
+    .panel {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulseSoft {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+
+    /* ========== 首页主视觉 ========== */
+    .hero {
+      background: linear-gradient(125deg, var(--sky-800) 0%, var(--sky-600) 48%, #38bdf8 100%);
+      border-radius: 20px;
+      padding: 2.25rem 1.75rem;
+      color: white;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      right: -20%;
+      top: -40%;
+      width: 60%;
+      height: 140%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+
+    .hero p {
+      opacity: 0.95;
+      max-width: 36rem;
+      font-size: 0.95rem;
+      position: relative;
+    }
+
+    .hero-cta {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      position: relative;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: transform 0.15s ease, box-shadow var(--transition);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: white;
+      color: var(--sky-800);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--sky-900);
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-lead {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      margin: -0.35rem 0 1.15rem;
+      max-width: 44rem;
+    }
+
+    .library-stat {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .library-stat strong {
+      color: var(--sky-700, #0369a1);
+      font-weight: 700;
+    }
+
+    .section-title .tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: var(--accent-warm);
+      color: white;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      animation: pulseSoft 2.5s ease infinite;
+    }
+
+    /* ========== 卡片网格 ========== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .deal-card {
+      background: var(--cloud);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 1.1rem;
+      min-height: 8.5rem;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      cursor: default;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
+    }
+
+    .deal-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+      border-color: var(--sky-200, #bae6fd);
+    }
+
+    .deal-card .route {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--sky-900);
+      margin-bottom: 0.35rem;
+    }
+
+    .deal-card .meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .deal-card .price-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .price {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--sky-600);
+    }
+
+    .price small {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.65rem;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .badge-discount {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .badge-hot {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-limit {
+      background: var(--sky-100);
+      color: var(--sky-800);
+    }
+
+    /* ========== 榜单 ========== */
+    .rank-list {
+      background: var(--cloud);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .rank-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.9rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+
+    .rank-item:last-child {
+      border-bottom: none;
+    }
+
+    .rank-item:hover {
+      background: var(--sky-50);
+    }
+
+    .rank-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--sky-100);
+      color: var(--sky-800);
+      font-weight: 800;
+      font-size: 0.85rem;
+      display: grid;
+      place-items: center;
+    }
+
+    .rank-num.top3 {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: white;
+    }
+
+    /* ========== 搜索面板 ========== */
+    .search-panel {
+      background: var(--cloud);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 1.35rem 1.35rem 1.25rem;
+      margin-bottom: 1.35rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .field-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+      line-height: 1.35;
+    }
+
+    .roundtrip-banner {
+      font-size: 0.8rem;
+      color: var(--sky-800);
+      background: var(--sky-100);
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 0.5rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--sky-500);
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+    }
+
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--border);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+    }
+
+    .filter-group input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--sky-600);
+    }
+
+    .filter-group select {
+      padding: 0.35rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .results-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .result-count {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .result-count strong {
+      color: var(--sky-800);
+    }
+
+    /* ========== 航班结果卡片 ========== */
+    .flight-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .flight-card {
+      background: var(--cloud);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      transition: border-color var(--transition), box-shadow var(--transition), opacity 0.25s ease;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+    }
+
+    @media (max-width: 640px) {
+      .flight-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .flight-card.highlight-cheapest {
+      border-color: var(--accent-good);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+    }
+
+    .flight-card.highlight-value {
+      border-color: var(--sky-500);
+      background: linear-gradient(135deg, #fff, var(--sky-50));
+    }
+
+    .flight-card.highlight-shortest {
+      border-left: 4px solid var(--accent-warm);
+    }
+
+    .flight-card.updating {
+      opacity: 0.65;
+    }
+
+    .flight-main {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.75rem 1rem;
+      align-items: center;
+    }
+
+    @media (max-width: 720px) {
+      .flight-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .airline-block {
+      text-align: center;
+      min-width: 72px;
+    }
+
+    .airline-code {
+      font-weight: 800;
+      color: var(--sky-900);
+      font-size: 0.95rem;
+    }
+
+    .flight-no {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .time-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .time-point {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .time-bar {
+      flex: 1;
+      min-width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--sky-300, #7dd3fc), var(--sky-500));
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .time-bar::after {
+      content: attr(data-duration);
+      position: absolute;
+      left: 50%;
+      top: -1.35rem;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .stops {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .flight-side {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .flight-side {
+        text-align: left;
+        align-items: flex-start;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        width: 100%;
+      }
+    }
+
+    .flight-price {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--sky-600);
+      line-height: 1.2;
+    }
+
+    .flight-price-note {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+      max-width: 11rem;
+    }
+
+    .flight-actions {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: white;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .btn-sm:hover {
+      background: var(--sky-50);
+      border-color: var(--sky-300, #7dd3fc);
+    }
+
+    .btn-sm.active {
+      background: var(--sky-100);
+      border-color: var(--sky-500);
+      color: var(--sky-800);
+      font-weight: 600;
+    }
+
+    .btn-sm:focus-visible {
+      outline: 2px solid var(--sky-500);
+      outline-offset: 2px;
+    }
+
+    .emphasis-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+    }
+
+    .emph-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    .emph-cheapest {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .emph-value {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .emph-short {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    /* ========== 目的地探索 ========== */
+    .dest-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .dest-card {
+      background: var(--cloud);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+      cursor: pointer;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+    }
+
+    .dest-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .dest-visual {
+      height: 100px;
+      background: linear-gradient(135deg, var(--sky-400, #38bdf8), var(--sky-700, #0369a1));
+      display: flex;
+      align-items: flex-end;
+      padding: 0.75rem;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .dest-body {
+      padding: 0.85rem;
+      font-size: 0.85rem;
+    }
+
+    .dest-body .from {
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .dest-price {
+      font-weight: 800;
+      color: var(--sky-600);
+      font-size: 1.05rem;
+    }
+
+    /* ========== 收藏与对比 ========== */
+    .compare-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.97);
+      color: white;
+      padding: 0.75rem 1rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      z-index: 95;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .compare-bar.visible {
+      display: flex;
+    }
+
+    .compare-bar .summary {
+      font-size: 0.85rem;
+    }
+
+    .compare-table-wrap {
+      overflow-x: auto;
+      margin-top: 1rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+    }
+
+    table.compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: var(--cloud);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .compare-table th,
+    .compare-table td {
+      padding: 0.65rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .compare-table th {
+      background: var(--sky-50);
+      font-weight: 700;
+      color: var(--sky-900);
+    }
+
+    .fav-empty {
+      color: var(--text-muted);
+      padding: 2rem;
+      text-align: center;
+      background: var(--cloud);
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+    }
+
+    /* ========== 规则说明 ========== */
+    .rules-box {
+      background: var(--cloud);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.35rem;
+      margin-top: 1.25rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    #panel-rules .panel-lead + .rules-box {
+      margin-top: 0.35rem;
+    }
+
+    .rules-box h3 {
+      font-size: 1rem;
+      color: var(--sky-900);
+      margin-bottom: 0.75rem;
+    }
+
+    .rules-box ul {
+      padding-left: 1.25rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .rules-box li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ========== 图例说明（搜索结果） ========== */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin: 0.15rem 0 0.85rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    /* Toast 提示（替代 alert） */
+    .toast-host {
+      position: fixed;
+      bottom: 1.35rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 125;
+      pointer-events: none;
+      width: min(92vw, 380px);
+      padding: 0 env(safe-area-inset-right, 0) 0 env(safe-area-inset-left, 0);
+      transition: bottom 0.25s ease;
+    }
+
+    .toast-host.toast-with-compare {
+      bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .toast {
+      background: rgba(15, 23, 42, 0.94);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      transform: translateY(8px);
+      pointer-events: auto;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 无结果时的推荐区 */
+    .empty-suggest {
+      background: var(--cloud);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-top: 0.75rem;
+    }
+
+    .empty-suggest h4 {
+      font-size: 0.95rem;
+      color: var(--sky-900);
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-suggest-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .search-actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .btn-secondary {
+      background: var(--sky-50);
+      color: var(--sky-800);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: var(--sky-100);
+    }
+
+    /* ========== 产品化：顶栏公告 / 头部信息 ========== */
+    .top-promo {
+      background: linear-gradient(90deg, #0c4a6e, #0369a1);
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 0.78rem;
+      text-align: center;
+      padding: 0.4rem 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.15rem;
+      text-align: right;
+    }
+
+    .header-meta .live {
+      font-size: 0.68rem;
+      color: var(--accent-good);
+      font-weight: 600;
+    }
+
+    .header-meta time {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* 行程类型切换 */
+    .trip-seg {
+      display: inline-flex;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 1rem;
+      background: var(--cloud);
+    }
+
+    .trip-seg button {
+      border: none;
+      background: transparent;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .trip-seg button[aria-pressed="true"] {
+      background: var(--sky-600);
+      color: white;
+      font-weight: 600;
+    }
+
+    .trip-seg button:focus-visible {
+      outline: 2px solid var(--sky-500);
+      outline-offset: -2px;
+    }
+
+    .od-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.5rem;
+      align-items: end;
+      margin-bottom: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      .od-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-swap {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--sky-50);
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      align-self: center;
+      transition: background var(--transition), transform 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-swap:hover {
+      background: var(--sky-100);
+      transform: rotate(180deg);
+    }
+
+    .btn-swap:focus-visible {
+      outline: 2px solid var(--sky-500);
+    }
+
+    .chips-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .chip {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: white;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--sky-800);
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .chip:hover {
+      border-color: var(--sky-500);
+      background: var(--sky-50);
+    }
+
+    .chip:focus-visible {
+      outline: 2px solid var(--sky-500);
+    }
+
+    .date-quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+    }
+
+    .date-quick button {
+      font-size: 0.72rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      border: 1px dashed var(--border);
+      background: var(--sky-50);
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--text-muted);
+    }
+
+    .date-quick button:hover {
+      border-style: solid;
+      border-color: var(--sky-400, #38bdf8);
+      color: var(--sky-800);
+    }
+
+    .toolbar-left {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-meta-line {
+      font-size: 0.88rem;
+      color: var(--sky-900);
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+
+    .data-updated {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .sort-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sort-wrap label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .sort-wrap select {
+      padding: 0.4rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 0.85rem;
+      min-width: 9.5rem;
+      background: white;
+    }
+
+    /* ========== 航班卡片（OTA 风格） ========== */
+    .flight-card--pro {
+      padding: 0;
+      overflow: hidden;
+      grid-template-columns: 1fr auto;
+    }
+
+    .flight-card--pro .fc-main {
+      padding: 1rem 1.1rem;
+    }
+
+    .fc-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .fc-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .fc-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--sky-100), #e0f2fe);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--sky-800);
+    }
+
+    .fc-airline-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--sky-900);
+    }
+
+    .fc-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+
+    .fc-route-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.5rem 0.75rem;
+      align-items: center;
+    }
+
+    @media (max-width: 520px) {
+      .fc-route-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .fc-mid {
+        order: 3;
+      }
+    }
+
+    .fc-ap {
+      text-align: center;
+    }
+
+    .fc-ap .code {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--sky-900);
+      letter-spacing: 0.04em;
+    }
+
+    .fc-ap .city {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .fc-ap .time {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-top: 0.15rem;
+    }
+
+    .fc-ap .time sup {
+      font-size: 0.55rem;
+      color: var(--accent-warm);
+      font-weight: 800;
+      margin-left: 1px;
+    }
+
+    .fc-mid {
+      text-align: center;
+      min-width: 88px;
+    }
+
+    .fc-mid .dur {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .fc-mid .line {
+      height: 2px;
+      background: linear-gradient(90deg, var(--sky-300, #7dd3fc), var(--sky-500));
+      margin: 0.35rem 0;
+      border-radius: 2px;
+    }
+
+    .fc-mid .stop {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .fc-foot {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.75rem;
+      margin-top: 0.75rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid #f1f5f9;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .fc-foot strong {
+      color: var(--sky-800);
+      font-weight: 600;
+    }
+
+    .fc-aside {
+      background: linear-gradient(180deg, #fafbfc 0%, #f0f9ff 100%);
+      border-left: 1px solid var(--border);
+      padding: 1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      gap: 0.45rem;
+      min-width: 148px;
+    }
+
+    .fc-aside .flight-price {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .fc-aside .flight-price-note {
+      text-align: center;
+      max-width: none;
+      margin: 0 auto;
+    }
+
+    .fc-seats {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #c2410c;
+      background: #fff7ed;
+      border-radius: 6px;
+      padding: 0.25rem 0.35rem;
+    }
+
+    .fc-seats.calm {
+      color: var(--text-muted);
+      background: #f8fafc;
+      font-weight: 600;
+    }
+
+    .btn-book {
+      width: 100%;
+      padding: 0.55rem 0.5rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: white;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-book:hover {
+      filter: brightness(1.05);
+    }
+
+    .btn-book:active {
+      transform: scale(0.98);
+    }
+
+    .btn-book:focus-visible {
+      outline: 2px solid var(--accent-warm);
+      outline-offset: 2px;
+    }
+
+    .btn-detail {
+      width: 100%;
+      padding: 0.35rem;
+      font-size: 0.72rem;
+      border: none;
+      background: transparent;
+      color: var(--sky-600);
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: inherit;
+    }
+
+    .fc-actions-row {
+      display: flex;
+      gap: 0.35rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .flight-card--pro {
+        grid-template-columns: 1fr;
+      }
+      .fc-aside {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .fc-aside .flight-price,
+      .fc-aside .flight-price-note {
+        text-align: left;
+      }
+      .btn-book {
+        width: auto;
+        flex: 1;
+        min-width: 120px;
+      }
+    }
+
+    /* 价格明细弹层 */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 160;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-sheet {
+      background: white;
+      border-radius: 16px;
+      max-width: 400px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+      transform: translateY(12px);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-backdrop.open .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-head {
+      padding: 1rem 1.15rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-head h3 {
+      font-size: 1rem;
+      color: var(--sky-900);
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--sky-50);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      color: var(--text-muted);
+      font-family: inherit;
+    }
+
+    .modal-body {
+      padding: 1rem 1.15rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .price-rows {
+      margin: 0.75rem 0;
+    }
+
+    .price-rows div {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .price-rows .total {
+      font-weight: 800;
+      color: var(--sky-900);
+      font-size: 1rem;
+      border-bottom: none;
+      margin-top: 0.35rem;
+    }
+
+    .modal-disclaimer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      line-height: 1.45;
+    }
+
+    .site-footer-pro {
+      margin-top: 2.5rem;
+      padding: 1.5rem 0 calc(1rem + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .site-footer-pro .links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .site-footer-pro .links button {
+      background: none;
+      border: none;
+      color: var(--sky-600);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .compare-bar {
+      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.compare-bar-on .main {
+      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <div class="top-promo" role="note">春季航线特惠 · 演示环境展示用 · 价格与余票为模拟数据，不作为购票依据</div>
+  <header class="site-header">
+    <div class="header-inner">
+      <button type="button" class="logo" id="logo-home" aria-label="云航特价，返回首页">
+        <span class="logo-icon" aria-hidden="true">✈</span>
+        <span>云航特价</span>
+      </button>
+      <nav class="nav-tabs" role="tablist" aria-label="主导航">
+        <button type="button" class="nav-tab active" id="tab-home" data-panel="home" role="tab" aria-selected="true" aria-controls="panel-home" tabindex="0">首页推荐</button>
+        <button type="button" class="nav-tab" id="tab-search" data-panel="search" role="tab" aria-selected="false" aria-controls="panel-search" tabindex="-1">搜索机票</button>
+        <button type="button" class="nav-tab" id="tab-explore" data-panel="explore" role="tab" aria-selected="false" aria-controls="panel-explore" tabindex="-1">目的地探索</button>
+        <button type="button" class="nav-tab" id="tab-saved" data-panel="saved" role="tab" aria-selected="false" aria-controls="panel-saved" tabindex="-1">收藏与对比</button>
+        <button type="button" class="nav-tab" id="tab-rules" data-panel="rules" role="tab" aria-selected="false" aria-controls="panel-rules" tabindex="-1">购票提示</button>
+      </nav>
+      <div class="header-meta">
+        <span class="live" aria-hidden="true">● 比价引擎演示</span>
+        <time id="header-clock" datetime="">--:--</time>
+        <span class="header-badge" style="font-size:0.7rem;">非真实出票</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main" id="main-content" tabindex="-1">
+    <!-- 首页 -->
+    <section id="panel-home" class="panel active" role="tabpanel" aria-labelledby="tab-home" aria-hidden="false">
+      <div class="hero">
+        <h1>发现特价机票，说走就走</h1>
+        <p>像真实订票一样筛选、排序、查看价格构成；以下为产品界面演示，数据为前端模拟，便于展示完整体验流程。</p>
+        <div class="hero-cta">
+          <button type="button" class="btn btn-primary" id="hero-to-search">立即搜索特价</button>
+          <button type="button" class="btn btn-ghost" id="hero-to-explore">探索便宜目的地</button>
+        </div>
+      </div>
+
+      <h2 class="section-title">今日推荐特价 <span class="tag">限时</span></h2>
+      <div class="card-grid" id="home-deals"></div>
+
+      <h2 class="section-title">热门目的地低价榜</h2>
+      <div class="rank-list" id="home-rank"></div>
+
+      <h2 class="section-title">折扣航线速览</h2>
+      <div class="card-grid" id="home-discount"></div>
+    </section>
+
+    <!-- 搜索 -->
+    <section id="panel-search" class="panel" role="tabpanel" aria-labelledby="tab-search" aria-hidden="true">
+      <h2 class="section-title">搜索机票</h2>
+      <p class="panel-lead">筛选、排序、价格明细、收藏与对比均作用于下方列表；切换单程/往返后价格与预算逻辑同步变化。</p>
+      <div class="search-panel">
+        <div class="trip-seg" role="group" aria-label="行程类型">
+          <button type="button" id="trip-oneway" aria-pressed="false">单程</button>
+          <button type="button" id="trip-round" aria-pressed="true">往返</button>
+        </div>
+        <div class="od-row">
+          <div class="field" style="margin:0;">
+            <label for="q-origin">出发城市 / 机场</label>
+            <input type="text" id="q-origin" placeholder="如：上海、PVG" autocomplete="off" />
+          </div>
+          <button type="button" class="btn-swap" id="btn-swap-od" title="交换出发地与目的地" aria-label="交换出发地与目的地">⇄</button>
+          <div class="field" style="margin:0;">
+            <label for="q-dest">到达城市 / 机场</label>
+            <input type="text" id="q-dest" placeholder="如：大阪、KIX" autocomplete="off" />
+          </div>
+        </div>
+        <p class="chips-label">热门出发（演示）</p>
+        <div class="chip-row" id="chip-origins" aria-label="热门出发城市"></div>
+        <p class="chips-label">热门目的地（演示）</p>
+        <div class="chip-row" id="chip-dests" aria-label="热门目的地城市"></div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="q-depart">出发日期</label>
+            <input type="date" id="q-depart" />
+            <div class="date-quick" role="group" aria-label="出发日期快捷选择">
+              <button type="button" data-date-offset="0">今天</button>
+              <button type="button" data-date-offset="3">三天后</button>
+              <button type="button" data-date-offset="7">一周后</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="q-return">返程日期</label>
+            <input type="date" id="q-return" aria-describedby="hint-return" />
+            <p class="field-hint" id="hint-return">往返模式下会按「去+返」演示总价展示与筛选；单程时忽略返程。</p>
+          </div>
+          <div class="field">
+            <label for="q-budget-min">预算下限（元）</label>
+            <input type="number" id="q-budget-min" placeholder="0" min="0" />
+          </div>
+          <div class="field">
+            <label for="q-budget-max">预算上限（元）</label>
+            <input type="number" id="q-budget-max" placeholder="不限" min="0" />
+          </div>
+        </div>
+        <div class="filters-row">
+          <label class="filter-group">
+            <input type="checkbox" id="f-direct" />
+            仅直飞
+          </label>
+          <label class="filter-group">
+            <span>航司</span>
+            <select id="f-airline">
+              <option value="">全部</option>
+            </select>
+          </label>
+          <label class="filter-group">
+            <span>最长飞行</span>
+            <select id="f-max-hours">
+              <option value="">不限</option>
+              <option value="3">≤3 小时</option>
+              <option value="5">≤5 小时</option>
+              <option value="8">≤8 小时</option>
+              <option value="12">≤12 小时</option>
+            </select>
+          </label>
+          <label class="filter-group">
+            <input type="checkbox" id="f-tax" checked />
+            含税价
+          </label>
+          <label class="filter-group">
+            <input type="checkbox" id="f-refund" />
+            可退改
+          </label>
+        </div>
+        <div class="search-actions-row">
+          <button type="button" class="btn btn-primary" id="btn-reset-filters">重置条件</button>
+          <button type="button" class="btn btn-secondary" id="btn-clear-filters">快速清空筛选</button>
+        </div>
+      </div>
+
+      <div class="roundtrip-banner" id="roundtrip-banner" hidden></div>
+
+      <div class="results-toolbar">
+        <div class="toolbar-left">
+          <p class="result-count">共 <strong id="result-count">0</strong> 个航班方案 <span style="font-weight:400;color:var(--text-muted);">（成人含税演示价）</span></p>
+          <p class="search-meta-line" id="search-meta-line">全国出发 · 全部目的地</p>
+          <p class="data-updated" id="data-updated" aria-live="polite"></p>
+          <p class="library-stat" id="library-stat" aria-live="polite"></p>
+        </div>
+        <div class="sort-wrap">
+          <label for="sort-results">排序</label>
+          <select id="sort-results" aria-label="搜索结果排序">
+            <option value="smart">智能推荐</option>
+            <option value="price">价格低 → 高</option>
+            <option value="duration">飞行时间短 → 长</option>
+            <option value="depart_early">起飞早 → 晚</option>
+            <option value="depart_late">起飞晚 → 早</option>
+          </select>
+        </div>
+      </div>
+      <div class="legend">
+        <span><span class="legend-dot" style="background:#10b981;"></span>全网低价</span>
+        <span><span class="legend-dot" style="background:#0ea5e9;"></span>性价比优选</span>
+        <span><span class="legend-dot" style="background:#f59e0b;border-left:4px solid #f59e0b;width:6px;"></span>最短时长</span>
+      </div>
+      <div class="flight-list" id="search-results"></div>
+    </section>
+
+    <!-- 探索 -->
+    <section id="panel-explore" class="panel" role="tabpanel" aria-labelledby="tab-explore" aria-hidden="true">
+      <h2 class="section-title">去哪儿更便宜</h2>
+      <p class="panel-lead">按季节热度与参考低价区间推荐；点击整张卡片会带上出发/到达并切换到「搜索机票」，与列表数据同源。</p>
+      <div class="dest-grid" id="explore-grid"></div>
+    </section>
+
+    <!-- 收藏对比 -->
+    <section id="panel-saved" class="panel" role="tabpanel" aria-labelledby="tab-saved" aria-hidden="true">
+      <h2 class="section-title">我的收藏</h2>
+      <p class="panel-lead">与「搜索机票」列表使用相同卡片样式；价格仍受当前单程/往返与返程日期设置影响。</p>
+      <div class="flight-list" id="favorites-list"></div>
+      <p class="fav-empty" id="fav-empty" style="display:none;">暂无收藏。在搜索结果中点击「收藏」即可加入。</p>
+
+      <h2 class="section-title" style="margin-top:2rem;">对比清单（最多 3 条）</h2>
+      <p class="panel-lead" style="font-size:0.85rem;margin-bottom:0.75rem;">在任意航班卡片上点「对比」加入；底部浮条与下表联动，最多保留 3 条。</p>
+      <div class="compare-table-wrap">
+        <table class="compare-table" id="compare-table">
+          <thead>
+            <tr>
+              <th>项目</th>
+              <th id="cmp-h1">—</th>
+              <th id="cmp-h2">—</th>
+              <th id="cmp-h3">—</th>
+            </tr>
+          </thead>
+          <tbody id="compare-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 规则 -->
+    <section id="panel-rules" class="panel" role="tabpanel" aria-labelledby="tab-rules" aria-hidden="true">
+      <h2 class="section-title">购票提示与规则说明</h2>
+      <p class="panel-lead">以下说明与真实平台常见规则一致，便于理解特价票限制；本站不售票，数据为演示。</p>
+      <div class="rules-box">
+        <h3>特价票常见限制</h3>
+        <ul>
+          <li><strong>退改签：</strong>多数特价票为「不可退」或高额手续费；部分允许改签但需补差价，请以出票后客规为准。</li>
+          <li><strong>行李额：</strong>廉价航司或促销舱位可能不含免费托运行李，仅含手提；加购行李建议在购票时一并确认。</li>
+          <li><strong>转机衔接：</strong>中转航班需自行确认转机时间是否满足机场最低衔接要求；跨航站楼或入境再转机时间需更充裕。</li>
+          <li><strong>税费与机建燃油：</strong>页面标注「含税」时含民航发展基金等常见税费；部分国际段可能另收离境税，以支付页为准。</li>
+          <li><strong>护照与签证：</strong>国际航线需证件有效期满足目的地要求；过境是否需要签证请单独核实。</li>
+          <li><strong>价格变动：</strong>特价席位数量有限，价格与余票实时变化，本页为演示数据，不构成要约。</li>
+        </ul>
+      </div>
+      <div class="rules-box">
+        <h3>使用本演示平台的说明</h3>
+        <ul>
+          <li>所有航班、价格、折扣均为前端模拟，用于展示产品与交互流程。</li>
+          <li>收藏与对比数据保存在本浏览器会话中，刷新页面后仍会保留（使用 localStorage）。</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="site-footer-pro">
+      <div class="links">
+        <button type="button" id="foot-rules">退改签说明</button>
+        <button type="button" id="foot-service">联系客服（演示）</button>
+        <button type="button" id="foot-about">关于云航特价</button>
+      </div>
+      <p>云航特价为课程/测评演示项目 · 不提供真实订票与支付 · 数据均为浏览器内模拟</p>
+      <p class="footer-note" style="border:none;margin-top:0.5rem;padding:0;">原生 HTML / CSS / JavaScript 单文件 · 本地双击即可运行</p>
+    </footer>
+  </main>
+
+  <div class="compare-bar" id="compare-bar" aria-live="polite">
+    <span class="summary" id="compare-summary">已选 0 条加入对比</span>
+    <button type="button" class="btn btn-primary" id="btn-goto-saved">查看对比表</button>
+  </div>
+
+  <div class="toast-host" id="toast-host" aria-live="assertive" aria-atomic="true">
+    <div class="toast" id="app-toast" role="status"></div>
+  </div>
+
+  <div class="modal-backdrop" id="price-modal" role="dialog" aria-modal="true" aria-labelledby="price-modal-title" aria-hidden="true">
+    <div class="modal-sheet" role="document">
+      <div class="modal-head">
+        <h3 id="price-modal-title">价格明细</h3>
+        <button type="button" class="modal-close" id="price-modal-close" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body" id="price-modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * 云航特价 — 贴近真实产品的界面演示（数据仍为前端模拟）
+     */
+
+    // ---------- 模拟航班数据库（程序生成 3500+ 条：每航线 2 个班次，结构对齐 OTA） ----------
+    function hashFlightId(id) {
+      var h = 0;
+      var s = String(id);
+      for (var i = 0; i < s.length; i++) {
+        h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+      }
+      return Math.abs(h);
+    }
+
+    function genRand(seed, salt) {
+      var x = Math.sin(seed * 0.0001 + salt * 7919) * 10000;
+      return x - Math.floor(x);
+    }
+
+    /** 国内城市 + 主要国际到达（仅供演示） */
+    var AIRPORT = {
+      上海: "PVG",
+      北京: "PEK",
+      广州: "CAN",
+      深圳: "SZX",
+      成都: "TFU",
+      重庆: "CKG",
+      西安: "XIY",
+      杭州: "HGH",
+      南京: "NKG",
+      武汉: "WUH",
+      郑州: "CGO",
+      长沙: "CSX",
+      青岛: "TAO",
+      厦门: "XMN",
+      天津: "TSN",
+      沈阳: "SHE",
+      哈尔滨: "HRB",
+      昆明: "KMG",
+      贵阳: "KWE",
+      南宁: "NNG",
+      海口: "HAK",
+      三亚: "SYX",
+      乌鲁木齐: "URC",
+      兰州: "LHW",
+      太原: "TYN",
+      济南: "TNA",
+      大连: "DLC",
+      南昌: "KHN",
+      福州: "FOC",
+      合肥: "HFE",
+      石家庄: "SJW",
+      长春: "CGQ",
+      珠海: "ZUH",
+      温州: "WNZ",
+      丽江: "LJG",
+      拉萨: "LXA",
+      东京: "HND",
+      大阪: "KIX",
+      首尔: "ICN",
+      曼谷: "BKK",
+      新加坡: "SIN",
+      吉隆坡: "KUL",
+      香港: "HKG",
+      台北: "TPE",
+      胡志明市: "SGN",
+      马尼拉: "MNL",
+      悉尼: "SYD",
+      伦敦: "LHR",
+      巴黎: "CDG",
+      迪拜: "DXB"
+    };
+
+    var GEN_DOMESTIC = [
+      "上海",
+      "北京",
+      "广州",
+      "深圳",
+      "成都",
+      "重庆",
+      "西安",
+      "杭州",
+      "南京",
+      "武汉",
+      "郑州",
+      "长沙",
+      "青岛",
+      "厦门",
+      "天津",
+      "沈阳",
+      "哈尔滨",
+      "昆明",
+      "贵阳",
+      "南宁",
+      "海口",
+      "三亚",
+      "乌鲁木齐",
+      "兰州",
+      "太原",
+      "济南",
+      "大连",
+      "南昌",
+      "福州",
+      "合肥",
+      "石家庄",
+      "长春",
+      "珠海",
+      "温州",
+      "丽江",
+      "拉萨"
+    ];
+
+    var GEN_INTL = ["东京", "大阪", "首尔", "曼谷", "新加坡", "吉隆坡", "香港", "台北", "胡志明市", "马尼拉", "悉尼", "伦敦", "巴黎", "迪拜"];
+
+    var GEN_AIRLINES_DOM = [
+      { name: "东航", code: "MU", lowCost: false },
+      { name: "南航", code: "CZ", lowCost: false },
+      { name: "国航", code: "CA", lowCost: false },
+      { name: "海航", code: "HU", lowCost: false },
+      { name: "厦航", code: "MF", lowCost: false },
+      { name: "深航", code: "ZH", lowCost: false },
+      { name: "川航", code: "3U", lowCost: false },
+      { name: "山航", code: "SC", lowCost: false },
+      { name: "吉祥", code: "HO", lowCost: false },
+      { name: "春秋", code: "9C", lowCost: true },
+      { name: "长龙", code: "GJ", lowCost: false },
+      { name: "华夏", code: "G5", lowCost: false },
+      { name: "中联航", code: "KN", lowCost: true },
+      { name: "天津航空", code: "GS", lowCost: false },
+      { name: "北部湾航", code: "GX", lowCost: true }
+    ];
+
+    var GEN_AIRLINES_INTL = [
+      { name: "东航", code: "MU", lowCost: false },
+      { name: "南航", code: "CZ", lowCost: false },
+      { name: "国航", code: "CA", lowCost: false },
+      { name: "全日空", code: "NH", lowCost: false },
+      { name: "日航", code: "JL", lowCost: false },
+      { name: "大韩", code: "KE", lowCost: false },
+      { name: "新加坡航", code: "SQ", lowCost: false },
+      { name: "国泰", code: "CX", lowCost: false },
+      { name: "亚航", code: "AK", lowCost: true },
+      { name: "酷航", code: "TR", lowCost: true },
+      { name: "春秋", code: "9C", lowCost: true },
+      { name: "吉祥", code: "HO", lowCost: false },
+      { name: "厦航", code: "MF", lowCost: false }
+    ];
+
+    var GEN_HUBS = [
+      "昆明长水",
+      "西安咸阳",
+      "郑州新郑",
+      "武汉天河",
+      "广州白云",
+      "成都天府",
+      "乌鲁木齐天山",
+      "上海浦东",
+      "北京大兴",
+      "深圳宝安",
+      "新加坡樟宜",
+      "吉隆坡",
+      "香港赤鱲角",
+      "厦门高崎",
+      "青岛胶东"
+    ];
+
+    var GEN_TAGS = [
+      "早班特惠",
+      "午班直减",
+      "红眼特价",
+      "周末出行",
+      "会员日",
+      "限时秒杀",
+      "企业协议价",
+      "亲子推荐",
+      "商务优选",
+      ""
+    ];
+
+    function pad2(n) {
+      return (n < 10 ? "0" : "") + n;
+    }
+
+    function makeFlightLeg(seed, index, origin, dest, intl) {
+      var r = function (s) {
+        return genRand(seed, s);
+      };
+      var airList = intl ? GEN_AIRLINES_INTL : GEN_AIRLINES_DOM;
+      var al = airList[Math.floor(r(1) * airList.length) % airList.length];
+      var stops = r(2) < (intl ? 0.24 : 0.09) ? 1 : 0;
+      var baseDur = intl ? 130 + Math.floor(r(3) * 560) : 48 + Math.floor(r(3) * 238);
+      if (stops) {
+        baseDur += 78 + Math.floor(r(4) * 150);
+      }
+      baseDur = Math.min(baseDur, intl ? 780 : 320);
+      var depMinTotal = 360 + Math.floor(r(5) * 900);
+      var depH = Math.floor(depMinTotal / 60);
+      var depM = depMinTotal % 60;
+      depM = Math.round(depM / 10) * 10;
+      if (depM >= 60) {
+        depM = 0;
+        depH++;
+      }
+      if (depH >= 24) depH = 23;
+      var depart = pad2(depH) + ":" + pad2(depM);
+      var totMin = baseDur;
+      var arrAbs = depH * 60 + depM + totMin;
+      var arrH = Math.floor((arrAbs % 1440) / 60);
+      var arrMi = arrAbs % 60;
+      arrMi = Math.round(arrMi / 5) * 5;
+      if (arrMi >= 60) {
+        arrMi = 0;
+        arrH = (arrH + 1) % 24;
+      }
+      var arrive = pad2(arrH) + ":" + pad2(arrMi);
+      var priceBase = intl ? 520 + Math.floor(r(6) * 8800) : 199 + Math.floor(r(6) * 2200);
+      if (al.lowCost) priceBase = Math.round(priceBase * 0.87);
+      if (stops) priceBase = Math.round(priceBase * 0.85);
+      var price = Math.max(99, priceBase);
+      var disc = (3 + Math.floor(r(7) * 55) / 10).toFixed(1) + "折";
+      var taxInc = al.lowCost ? r(8) < 0.42 : true;
+      var ref = !al.lowCost && r(9) < 0.14;
+      var hub = GEN_HUBS[Math.floor(r(10) * GEN_HUBS.length) % GEN_HUBS.length];
+      var hLay = 1 + Math.floor(r(11) * 4);
+      var mLay = [0, 10, 20, 30, 40, 50][Math.floor(r(12) * 6) % 6];
+      var stopNote = stops ? hub + " 中转约" + hLay + "小时" + mLay + "分" : undefined;
+      var tag = GEN_TAGS[Math.floor(r(13) * GEN_TAGS.length) % GEN_TAGS.length];
+      var fn = al.code + (1800 + Math.floor(r(14) * 8200));
+      return {
+        id: "g" + index,
+        origin: origin,
+        dest: dest,
+        airline: al.name,
+        flightNo: String(fn),
+        depart: depart,
+        arrive: arrive,
+        durationMin: totMin,
+        stops: stops,
+        stopNote: stopNote,
+        price: price,
+        discount: disc,
+        taxIncluded: taxInc,
+        refundable: ref,
+        tag: tag
+      };
+    }
+
+    function generateMockFlights() {
+      var list = [];
+      var n = 0;
+      var i;
+      var j;
+      for (i = 0; i < GEN_DOMESTIC.length; i++) {
+        for (j = 0; j < GEN_DOMESTIC.length; j++) {
+          if (i === j) continue;
+          var seed = i * 7919 + j * 104729 + 17;
+          list.push(makeFlightLeg(seed, n++, GEN_DOMESTIC[i], GEN_DOMESTIC[j], false));
+          list.push(makeFlightLeg(seed + 384047, n++, GEN_DOMESTIC[i], GEN_DOMESTIC[j], false));
+        }
+        for (j = 0; j < GEN_INTL.length; j++) {
+          var seedI = i * 13007 + j * 50021 + 999983;
+          list.push(makeFlightLeg(seedI, n++, GEN_DOMESTIC[i], GEN_INTL[j], true));
+          list.push(makeFlightLeg(seedI + 528001, n++, GEN_DOMESTIC[i], GEN_INTL[j], true));
+        }
+      }
+      return list;
+    }
+
+    var MOCK_FLIGHTS = generateMockFlights();
+
+    function enrichFlights() {
+      var planes = ["空客 A320neo", "波音 737-800", "空客 A321", "空客 A330-300", "波音 787-9", "空客 A350"];
+      MOCK_FLIGHTS.forEach(function (f) {
+        f.fromCode = AIRPORT[f.origin] || String(f.origin).slice(0, 3).toUpperCase();
+        f.toCode = AIRPORT[f.dest] || String(f.dest).slice(0, 3).toUpperCase();
+        var fullSvc = /全日空|日航|大韩|新加坡航|国泰|国航|东航|南航|海航|厦航|深航|川航|山航|吉祥|长龙|华夏|天津航空/.test(f.airline);
+        f.cabin = fullSvc ? "经济舱" : "特价经济舱";
+        if (f.refundable) f.cabin = "经济舱 · 退改灵活";
+        f.baggage = /亚航|春秋|酷航|中联航|北部湾/.test(f.airline) ? "手提7kg · 托运需加购" : "托运20kg · 手提10kg";
+        var h = hashFlightId(f.id + f.flightNo);
+        f.aircraft = planes[h % planes.length];
+        f.meal = f.durationMin >= 240 ? "正餐或热食" : f.durationMin >= 100 ? "点心/饮品" : "饮品";
+        f.seatsLeft = 2 + (h % 11);
+      });
+    }
+
+    enrichFlights();
+
+    const DEST_SPOTS = [
+      { city: "曼谷", season: "全年热门", from: "广州", low: 520, high: 1200, hint: "雨季前后常有促销" },
+      { city: "大阪", season: "春秋佳季", from: "上海", low: 659, high: 1600, hint: "关注红眼与中转" },
+      { city: "青岛", season: "夏季海滨", from: "杭州", low: 410, high: 900, hint: "周末短途性价比高" },
+      { city: "丽江", season: "四季皆宜", from: "成都", low: 320, high: 800, hint: "川内航线常年低价" },
+      { city: "新加坡", season: "商务+度假", from: "深圳", low: 688, high: 2000, hint: "中转可省一大截" },
+      { city: "三亚", season: "冬季旺季", from: "上海", low: 690, high: 2200, hint: "提前订+周中出发" }
+    ];
+
+    // ---------- 工具函数 ----------
+    function formatDuration(minutes) {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      return h > 0 ? `${h}小时${m > 0 ? m + "分" : ""}` : `${m}分钟`;
+    }
+
+    function effectivePrice(f) {
+      return f.taxIncluded ? f.price : Math.round(f.price * 1.08);
+    }
+
+    function isRoundTripMode() {
+      var el = document.getElementById("trip-round");
+      return el && el.getAttribute("aria-pressed") === "true";
+    }
+
+    /** 往返且已选返程日时，按双程演示价展示与筛选 */
+    function hasReturnDate() {
+      if (!isRoundTripMode()) return false;
+      var v = document.getElementById("q-return").value;
+      return Boolean(v && v.trim());
+    }
+
+    function parseTimeToMin(t) {
+      var p = (t || "0:0").split(":");
+      return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+    }
+
+    function isNextDayArrival(f) {
+      return parseTimeToMin(f.arrive) < parseTimeToMin(f.depart);
+    }
+
+    function syncTripModeUi() {
+      var ret = document.getElementById("q-return");
+      if (!ret) return;
+      if (isRoundTripMode()) {
+        ret.disabled = false;
+      } else {
+        ret.disabled = true;
+        ret.value = "";
+      }
+    }
+
+    /**
+     * 筛选与高亮用的「总价」：单程=含税/估算价；往返=去程+回程演示价（回程按去程约 91% 模拟联订优惠）。
+     */
+    function tripPriceForFilter(f) {
+      const one = effectivePrice(f);
+      if (!hasReturnDate()) return one;
+      return Math.round(one + one * 0.91);
+    }
+
+    function uniqueAirlines() {
+      return [...new Set(MOCK_FLIGHTS.map((x) => x.airline))].sort();
+    }
+
+    // ---------- 状态：收藏与对比 ----------
+    const STORAGE_FAV = "skydeal_favorites_v1";
+    const STORAGE_CMP = "skydeal_compare_v1";
+
+    function loadIds(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveIds(key, ids) {
+      localStorage.setItem(key, JSON.stringify(ids));
+    }
+
+    let favoriteIds = loadIds(STORAGE_FAV);
+    let compareIds = loadIds(STORAGE_CMP);
+
+    function getFlightById(id) {
+      return MOCK_FLIGHTS.find((f) => f.id === id);
+    }
+
+    function toggleFavorite(id) {
+      const i = favoriteIds.indexOf(id);
+      if (i >= 0) favoriteIds.splice(i, 1);
+      else favoriteIds.push(id);
+      saveIds(STORAGE_FAV, favoriteIds);
+      renderFavorites();
+      refreshResultButtons();
+    }
+
+    let toastHideTimer;
+    function showToast(message, durationMs) {
+      const el = document.getElementById("app-toast");
+      const ms = durationMs != null ? durationMs : 3400;
+      el.textContent = message;
+      el.classList.add("visible");
+      clearTimeout(toastHideTimer);
+      toastHideTimer = setTimeout(function () {
+        el.classList.remove("visible");
+      }, ms);
+    }
+
+    function updateRoundtripBanner() {
+      var banner = document.getElementById("roundtrip-banner");
+      if (!banner) return;
+      if (!isRoundTripMode()) {
+        banner.hidden = true;
+        banner.textContent = "";
+        return;
+      }
+      if (!document.getElementById("q-return").value) {
+        banner.hidden = false;
+        banner.textContent = "往返模式：请选择返程日期后，系统将按「去程+返程」演示总价展示并参与预算筛选。";
+        return;
+      }
+      banner.hidden = false;
+      banner.textContent = "往返模式已生效：卡片大价为双程演示总价，预算上下限亦按双程比较。";
+    }
+
+    function toggleCompare(id) {
+      const i = compareIds.indexOf(id);
+      if (i >= 0) {
+        compareIds.splice(i, 1);
+      } else {
+        if (compareIds.length >= 3) {
+          showToast("对比最多选 3 条：请先在某条航班上再点一次「已对比」取消，或打开「收藏与对比」管理。");
+          return;
+        }
+        compareIds.push(id);
+      }
+      saveIds(STORAGE_CMP, compareIds);
+      updateCompareBar();
+      renderCompareTable();
+      refreshResultButtons();
+    }
+
+    function isFav(id) {
+      return favoriteIds.includes(id);
+    }
+
+    function isCmp(id) {
+      return compareIds.includes(id);
+    }
+
+    function updateCompareBar() {
+      const bar = document.getElementById("compare-bar");
+      const sum = document.getElementById("compare-summary");
+      const n = compareIds.length;
+      sum.textContent = `已选 ${n} 条加入对比`;
+      bar.classList.toggle("visible", n > 0);
+      document.body.classList.toggle("compare-bar-on", n > 0);
+      var th = document.getElementById("toast-host");
+      if (th) th.classList.toggle("toast-with-compare", n > 0);
+    }
+
+    // ---------- 筛选逻辑 ----------
+    function getFilterState() {
+      return {
+        origin: document.getElementById("q-origin").value.trim(),
+        dest: document.getElementById("q-dest").value.trim(),
+        budgetMin: parseFloat(document.getElementById("q-budget-min").value) || 0,
+        budgetMax: parseFloat(document.getElementById("q-budget-max").value) || Infinity,
+        directOnly: document.getElementById("f-direct").checked,
+        airline: document.getElementById("f-airline").value,
+        maxHours: document.getElementById("f-max-hours").value ? parseFloat(document.getElementById("f-max-hours").value) : null,
+        taxOnly: document.getElementById("f-tax").checked,
+        refundOnly: document.getElementById("f-refund").checked
+      };
+    }
+
+    function matchesCityOrCode(city, code, q) {
+      if (!q) return true;
+      q = q.trim();
+      if (city.indexOf(q) >= 0) return true;
+      var u = q.toUpperCase();
+      return u.length > 0 && (code || "").indexOf(u) >= 0;
+    }
+
+    function filterFlights(list) {
+      const s = getFilterState();
+      return list.filter((f) => {
+        const ep = tripPriceForFilter(f);
+        if (!matchesCityOrCode(f.origin, f.fromCode, s.origin)) return false;
+        if (!matchesCityOrCode(f.dest, f.toCode, s.dest)) return false;
+        if (ep < s.budgetMin || ep > s.budgetMax) return false;
+        if (s.directOnly && f.stops > 0) return false;
+        if (s.airline && f.airline !== s.airline) return false;
+        if (s.maxHours != null && f.durationMin > s.maxHours * 60) return false;
+        if (s.taxOnly && !f.taxIncluded) return false;
+        if (s.refundOnly && !f.refundable) return false;
+        return true;
+      });
+    }
+
+    function sortFlights(list) {
+      var sel = document.getElementById("sort-results");
+      var mode = sel ? sel.value : "smart";
+      var arr = list.slice();
+      function tp(f) {
+        return tripPriceForFilter(f);
+      }
+      function pt(f) {
+        return parseTimeToMin(f.depart);
+      }
+      if (mode === "price") {
+        arr.sort(function (a, b) {
+          return tp(a) - tp(b);
+        });
+      } else if (mode === "duration") {
+        arr.sort(function (a, b) {
+          return a.durationMin - b.durationMin;
+        });
+      } else if (mode === "depart_early") {
+        arr.sort(function (a, b) {
+          return pt(a) - pt(b);
+        });
+      } else if (mode === "depart_late") {
+        arr.sort(function (a, b) {
+          return pt(b) - pt(a);
+        });
+      } else {
+        arr.sort(function (a, b) {
+          var d = tp(a) - tp(b);
+          if (d !== 0) return d;
+          return a.durationMin - b.durationMin;
+        });
+      }
+      return arr;
+    }
+
+    function annotateHighlights(flights) {
+      if (!flights.length) return flights.map((f) => ({ ...f, flags: [] }));
+      const withEp = flights.map((f) => ({ ...f, ep: tripPriceForFilter(f) }));
+      const minP = Math.min(...withEp.map((x) => x.ep));
+      const minDur = Math.min(...withEp.map((x) => x.durationMin));
+      const scores = withEp.map((f) => {
+        const priceScore = 1 - (f.ep - minP) / (Math.max(...withEp.map((x) => x.ep)) - minP || 1);
+        const timeScore = 1 - (f.durationMin - minDur) / (Math.max(...withEp.map((x) => x.durationMin)) - minDur || 1);
+        const value = priceScore * 0.65 + timeScore * 0.35;
+        return { ...f, value };
+      });
+      const bestValueId = scores.reduce((a, b) => (a.value >= b.value ? a : b)).id;
+      return scores.map((f) => {
+        const flags = [];
+        if (f.ep === minP) flags.push("cheapest");
+        if (f.id === bestValueId && flights.length > 1) flags.push("value");
+        if (f.durationMin === minDur) flags.push("shortest");
+        const { value, ep, ...rest } = f;
+        return { ...rest, flags };
+      });
+    }
+
+    // ---------- 渲染：首页 ----------
+    function renderHome() {
+      const sorted = [...MOCK_FLIGHTS].sort((a, b) => effectivePrice(a) - effectivePrice(b));
+      const deals = sorted.slice(0, 4);
+      const discount = [...MOCK_FLIGHTS]
+        .filter((f) => {
+          const n = parseFloat(String(f.discount).replace("折", ""));
+          return n < 5;
+        })
+        .slice(0, 4);
+
+      const dealsEl = document.getElementById("home-deals");
+      dealsEl.innerHTML = deals
+        .map(
+          (f) => `
+        <article class="deal-card">
+          <div class="route">${f.origin} → ${f.dest}</div>
+          <div class="meta">${f.fromCode}→${f.toCode} · ${f.airline} ${f.flightNo} · ${f.depart}</div>
+          <div class="price-row">
+            <span class="price">¥${effectivePrice(f)}<small>${f.taxIncluded ? "含税" : "未税估"}</small></span>
+            <span class="badge badge-discount">${f.discount}</span>
+          </div>
+          <div class="badges">
+            ${f.stops === 0 ? '<span class="badge badge-hot">直飞</span>' : "<span class=\"badge badge-limit\">" + f.stops + "程中转</span>"}
+            ${f.tag ? `<span class="badge badge-limit">${escapeHtml(f.tag)}</span>` : ""}
+          </div>
+        </article>`
+        )
+        .join("");
+
+      const rankEl = document.getElementById("home-rank");
+      const rankData = [...MOCK_FLIGHTS].sort((a, b) => effectivePrice(a) - effectivePrice(b)).slice(0, 5);
+      rankEl.innerHTML = rankData
+        .map(
+          (f, idx) => `
+        <div class="rank-item">
+          <span class="rank-num ${idx < 3 ? "top3" : ""}">${idx + 1}</span>
+          <div>
+            <strong>${f.origin} — ${f.dest}</strong>
+            <div style="font-size:0.8rem;color:var(--text-muted);">${f.fromCode}-${f.toCode} · ${f.airline} · ${formatDuration(f.durationMin)}</div>
+          </div>
+          <div style="font-weight:800;color:var(--sky-600);">¥${effectivePrice(f)}</div>
+        </div>`
+        )
+        .join("");
+
+      const discEl = document.getElementById("home-discount");
+      discEl.innerHTML = discount
+        .map(
+          (f) => `
+        <article class="deal-card">
+          <div class="route">${f.origin} → ${f.dest}</div>
+          <div class="meta">限时参考价 · 余票紧张</div>
+          <div class="price-row">
+            <span class="price">¥${effectivePrice(f)}</span>
+            <span class="badge badge-discount">${f.discount}</span>
+          </div>
+          <div class="badges"><span class="badge badge-hot">折扣航线</span></div>
+        </article>`
+        )
+        .join("");
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    }
+
+    // ---------- 渲染：搜索结果 ----------
+    function formatChineseDate(iso) {
+      if (!iso) return "";
+      var wk = ["日", "一", "二", "三", "四", "五", "六"];
+      var d = new Date(iso + "T12:00:00");
+      if (isNaN(d.getTime())) return iso;
+      return d.getMonth() + 1 + "月" + d.getDate() + "日 周" + wk[d.getDay()];
+    }
+
+    function updateSearchMetaLine() {
+      var el = document.getElementById("search-meta-line");
+      if (!el) return;
+      var o = document.getElementById("q-origin").value.trim();
+      var d = document.getElementById("q-dest").value.trim();
+      var dep = document.getElementById("q-depart").value;
+      var ret = document.getElementById("q-return").value;
+      var parts = [];
+      parts.push((o || "全国") + " → " + (d || "各地"));
+      if (dep) parts.push(formatChineseDate(dep) + " 去程");
+      if (isRoundTripMode()) {
+        parts.push(ret ? formatChineseDate(ret) + " 返程" : "待选返程");
+      }
+      el.textContent = parts.join(" · ");
+    }
+
+    function touchUpdatedLabel() {
+      var el = document.getElementById("data-updated");
+      if (!el) return;
+      var t = new Date();
+      el.textContent =
+        "列表已于 " +
+        t.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
+        " 根据当前条件刷新（演示）";
+    }
+
+    function tickHeaderClock() {
+      var el = document.getElementById("header-clock");
+      if (!el) return;
+      var n = new Date();
+      el.textContent = n.toLocaleString("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+      el.setAttribute("datetime", n.toISOString());
+    }
+
+    function computeFareBreakdown(f) {
+      var total = effectivePrice(f);
+      var ticket = Math.round(total * 0.76);
+      var tax = Math.round(total * 0.14);
+      var fuel = Math.max(0, total - ticket - tax);
+      return { ticket: ticket, tax: tax, fuel: fuel, total: total };
+    }
+
+    function openPriceModal(f) {
+      var modal = document.getElementById("price-modal");
+      var body = document.getElementById("price-modal-body");
+      var br = computeFareBreakdown(f);
+      var one = effectivePrice(f);
+      var trip = tripPriceForFilter(f);
+      var html = "";
+      html += "<p><strong>" + escapeHtml(f.airline) + " " + escapeHtml(f.flightNo) + "</strong><br/>";
+      html +=
+        escapeHtml(f.origin) +
+        "（" +
+        escapeHtml(f.fromCode) +
+        "） → " +
+        escapeHtml(f.dest) +
+        "（" +
+        escapeHtml(f.toCode) +
+        "）</p>";
+      html += '<div class="price-rows">';
+      html += "<div><span>机票款（演示）</span><span>¥" + br.ticket + "</span></div>";
+      html += "<div><span>税费/民航发展基金等（演示）</span><span>¥" + br.tax + "</span></div>";
+      html += "<div><span>燃油附加（演示）</span><span>¥" + br.fuel + "</span></div>";
+      html += '<div class="total"><span>成人单程应付参考</span><span>¥' + one + "</span></div>";
+      if (hasReturnDate()) {
+        html +=
+          '<div class="total" style="margin-top:0.35rem;"><span>成人往返演示合计</span><span>¥' +
+          trip +
+          "</span></div>";
+        html +=
+          "<p style=\"font-size:0.78rem;margin:0.5rem 0 0;color:var(--text-muted);\">返程价按去程约 91% 模拟联订优惠，非航空公司实价。</p>";
+      }
+      html += "</div>";
+      html +=
+        '<p class="modal-disclaimer">金额为界面演示拆分，下单以支付页为准。行李与退改规则以航司客规为准。</p>';
+      body.innerHTML = html;
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      document.getElementById("price-modal-close").focus();
+    }
+
+    function closePriceModal() {
+      var m = document.getElementById("price-modal");
+      m.classList.remove("open");
+      m.setAttribute("aria-hidden", "true");
+    }
+
+    function flightPriceHtml(f) {
+      var one = effectivePrice(f);
+      var total = tripPriceForFilter(f);
+      if (!hasReturnDate()) {
+        return '<div class="flight-price">¥' + one + '<span style="font-size:0.65rem;font-weight:600;color:var(--text-muted);margin-left:4px;">起</span></div>';
+      }
+      return (
+        '<div class="flight-price">¥' +
+        total +
+        '</div><div class="flight-price-note">往返演示总价 · 单程参考 ¥' +
+        one +
+        "</div>"
+      );
+    }
+
+    function flightCardHtml(f) {
+      var cardClass = "flight-card flight-card--pro";
+      if (f.flags.includes("cheapest")) cardClass += " highlight-cheapest";
+      if (f.flags.includes("value")) cardClass += " highlight-value";
+      if (f.flags.includes("shortest")) cardClass += " highlight-shortest";
+
+      var nd = isNextDayArrival(f) ? "<sup>+1</sup>" : "";
+      var stopTxt = f.stops === 0 ? "直飞" : f.stopNote || f.stops + " 次经停";
+      var seatsCls = f.seatsLeft <= 4 ? "" : " calm";
+      var seatsTxt = f.seatsLeft <= 4 ? "紧张 · 剩 " + f.seatsLeft + " 张" : "余票充足";
+
+      var emph = [];
+      if (f.flags.includes("cheapest")) emph.push('<span class="emph-tag emph-cheapest">低价</span>');
+      if (f.flags.includes("value")) emph.push('<span class="emph-tag emph-value">优选</span>');
+      if (f.flags.includes("shortest")) emph.push('<span class="emph-tag emph-short">省时</span>');
+
+      var logoChar = escapeHtml((f.airline || "航").charAt(0));
+      var favLabel = (isFav(f.id) ? "取消收藏 " : "收藏 ") + f.flightNo;
+      var cmpLabel = (isCmp(f.id) ? "取消对比 " : "加入对比 ") + f.flightNo;
+
+      var badgeHtml = f.tag
+        ? '<span class="badge badge-limit">' +
+          escapeHtml(f.tag) +
+          '</span><span class="badge badge-discount">' +
+          escapeHtml(f.discount) +
+          "</span>"
+        : '<span class="badge badge-discount">' + escapeHtml(f.discount) + "</span>";
+
+      return (
+        '<article class="' +
+        cardClass +
+        '" data-id="' +
+        escapeHtml(f.id) +
+        '">' +
+        '<div class="fc-main">' +
+        '<div class="fc-head">' +
+        '<div class="fc-brand">' +
+        '<span class="fc-logo" aria-hidden="true">' +
+        logoChar +
+        "</span>" +
+        "<div>" +
+        '<div class="fc-airline-name">' +
+        escapeHtml(f.airline) +
+        "</div>" +
+        '<div class="fc-sub">' +
+        escapeHtml(f.flightNo) +
+        " · " +
+        escapeHtml(f.cabin) +
+        "</div>" +
+        "</div>" +
+        "</div>" +
+        '<div class="emphasis-tags">' +
+        emph.join("") +
+        "</div>" +
+        "</div>" +
+        '<div class="fc-route-grid">' +
+        '<div class="fc-ap">' +
+        '<div class="code">' +
+        escapeHtml(f.fromCode) +
+        "</div>" +
+        '<div class="city">' +
+        escapeHtml(f.origin) +
+        "</div>" +
+        '<div class="time">' +
+        f.depart +
+        "</div>" +
+        "</div>" +
+        '<div class="fc-mid">' +
+        '<div class="dur">' +
+        formatDuration(f.durationMin) +
+        "</div>" +
+        '<div class="line"></div>' +
+        '<div class="stop">' +
+        escapeHtml(stopTxt) +
+        "</div>" +
+        "</div>" +
+        '<div class="fc-ap">' +
+        '<div class="code">' +
+        escapeHtml(f.toCode) +
+        "</div>" +
+        '<div class="city">' +
+        escapeHtml(f.dest) +
+        "</div>" +
+        '<div class="time">' +
+        f.arrive +
+        nd +
+        "</div>" +
+        "</div>" +
+        "</div>" +
+        '<div class="fc-foot">' +
+        "<span><strong>" +
+        escapeHtml(f.aircraft) +
+        "</strong></span>" +
+        "<span>行李 " +
+        escapeHtml(f.baggage) +
+        "</span>" +
+        "<span>" +
+        escapeHtml(f.meal) +
+        "</span>" +
+        "<span>" +
+        (f.taxIncluded ? "含税价" : "税费已估算") +
+        " · " +
+        (f.refundable ? "可退改" : "退改受限") +
+        "</span>" +
+        badgeHtml +
+        "</div>" +
+        "</div>" +
+        '<div class="fc-aside">' +
+        flightPriceHtml(f) +
+        '<div class="fc-seats' +
+        seatsCls +
+        '">' +
+        seatsTxt +
+        "</div>" +
+        '<button type="button" class="btn-book" data-book-id="' +
+        escapeHtml(f.id) +
+        '">订购</button>' +
+        '<button type="button" class="btn-detail" data-detail-id="' +
+        escapeHtml(f.id) +
+        '">价格明细</button>' +
+        '<div class="fc-actions-row">' +
+        '<button type="button" class="btn-sm fav-btn ' +
+        (isFav(f.id) ? "active" : "") +
+        '" data-action="fav" data-id="' +
+        escapeHtml(f.id) +
+        '" aria-label="' +
+        escapeHtml(favLabel) +
+        '">' +
+        (isFav(f.id) ? "已收藏" : "收藏") +
+        "</button>" +
+        '<button type="button" class="btn-sm cmp-btn ' +
+        (isCmp(f.id) ? "active" : "") +
+        '" data-action="cmp" data-id="' +
+        escapeHtml(f.id) +
+        '" aria-label="' +
+        escapeHtml(cmpLabel) +
+        '">' +
+        (isCmp(f.id) ? "已对比" : "对比") +
+        "</button>" +
+        "</div>" +
+        "</div>" +
+        "</article>"
+      );
+    }
+
+    const SEARCH_DEBOUNCE_MS = 280;
+    let searchDebounceTimer;
+    let updatingVisualTimer;
+
+    function buildEmptySearchHtml() {
+      const ids = [...MOCK_FLIGHTS]
+        .sort((a, b) => effectivePrice(a) - effectivePrice(b))
+        .slice(0, 3)
+        .map((x) => x.id);
+      const btns = ids
+        .map((id) => {
+          const fl = getFlightById(id);
+          if (!fl) return "";
+          return `<button type="button" class="btn-sm" data-suggest-id="${escapeHtml(fl.id)}">${escapeHtml(fl.origin)}→${escapeHtml(fl.dest)} ¥${effectivePrice(fl)}起</button>`;
+        })
+        .join("");
+      return (
+        '<p class="fav-empty" style="display:block;border-style:solid;">没有符合条件的航班，可尝试放宽预算、取消「仅直飞」或清空出发地/目的地。</p>' +
+        '<div class="empty-suggest">' +
+        "<h4>试试这些低价方向（一键填入）</h4>" +
+        '<p class="field-hint" style="margin-bottom:0.75rem;">也可点下方「快速清空筛选」只保留日期、快速放宽条件。</p>' +
+        '<div class="empty-suggest-actions">' +
+        btns +
+        "</div></div>"
+      );
+    }
+
+    function scheduleSearch(animate) {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(function () {
+        runSearch(animate);
+      }, SEARCH_DEBOUNCE_MS);
+    }
+
+    function scheduleSearchImmediate(animate) {
+      clearTimeout(searchDebounceTimer);
+      runSearch(animate);
+    }
+
+    function runSearch(animate) {
+      syncTripModeUi();
+      updateRoundtripBanner();
+      var container = document.getElementById("search-results");
+      if (animate) {
+        container.classList.add("updating");
+        clearTimeout(updatingVisualTimer);
+        updatingVisualTimer = setTimeout(function () {
+          container.classList.remove("updating");
+        }, 200);
+      }
+      var filtered = sortFlights(filterFlights(MOCK_FLIGHTS));
+      var annotated = annotateHighlights(filtered);
+      document.getElementById("result-count").textContent = String(annotated.length);
+      container.innerHTML = annotated.length ? annotated.map(flightCardHtml).join("") : buildEmptySearchHtml();
+      updateSearchMetaLine();
+      touchUpdatedLabel();
+      tickHeaderClock();
+    }
+
+    function renderPopularChips() {
+      var og = ["上海", "北京", "广州", "成都", "深圳"];
+      var ds = ["大阪", "曼谷", "新加坡", "三亚", "东京", "青岛"];
+      document.getElementById("chip-origins").innerHTML = og
+        .map(function (c) {
+          return '<button type="button" class="chip" data-chip-orig="' + escapeHtml(c) + '">' + escapeHtml(c) + "</button>";
+        })
+        .join("");
+      document.getElementById("chip-dests").innerHTML = ds
+        .map(function (c) {
+          return '<button type="button" class="chip" data-chip-dest="' + escapeHtml(c) + '">' + escapeHtml(c) + "</button>";
+        })
+        .join("");
+    }
+
+    function refreshResultButtons() {
+      document.querySelectorAll("#search-results .fav-btn").forEach((btn) => {
+        const id = btn.getAttribute("data-id");
+        btn.classList.toggle("active", isFav(id));
+        btn.textContent = isFav(id) ? "已收藏" : "收藏";
+      });
+      document.querySelectorAll("#search-results .cmp-btn").forEach((btn) => {
+        const id = btn.getAttribute("data-id");
+        btn.classList.toggle("active", isCmp(id));
+        btn.textContent = isCmp(id) ? "已对比" : "对比";
+      });
+    }
+
+    // ---------- 渲染：探索 ----------
+    function renderExplore() {
+      document.getElementById("explore-grid").innerHTML = DEST_SPOTS.map(function (d) {
+        var fc = AIRPORT[d.from] || "";
+        var tc = AIRPORT[d.city] || "";
+        var route = fc && tc ? fc + " → " + tc + " · " : "";
+        return (
+          '<article class="dest-card" data-dest="' +
+          escapeHtml(d.city) +
+          '" data-from="' +
+          escapeHtml(d.from) +
+          '">' +
+          '<div class="dest-visual">' +
+          escapeHtml(d.city) +
+          "</div>" +
+          '<div class="dest-body">' +
+          '<div class="from">' +
+          route +
+          "参考出发：" +
+          escapeHtml(d.from) +
+          "</div>" +
+          '<div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:0.35rem;">' +
+          escapeHtml(d.season) +
+          " · " +
+          escapeHtml(d.hint) +
+          "</div>" +
+          '<div class="dest-price">¥' +
+          d.low +
+          ' 起 <span style="font-size:0.75rem;font-weight:500;color:var(--text-muted);">近期参考 ¥' +
+          d.high +
+          "</span></div>" +
+          '<p style="font-size:0.7rem;color:var(--text-muted);margin-top:0.35rem;">点击查看该方向特价航班列表</p>' +
+          "</div>" +
+          "</article>"
+        );
+      }).join("");
+    }
+
+    // ---------- 渲染：收藏与对比表 ----------
+    function renderFavorites() {
+      const list = document.getElementById("favorites-list");
+      const empty = document.getElementById("fav-empty");
+      const favs = favoriteIds.map(getFlightById).filter(Boolean);
+      empty.style.display = favs.length ? "none" : "block";
+      if (!favs.length) {
+        list.innerHTML = "";
+        return;
+      }
+      const annotated = annotateHighlights(favs);
+      list.innerHTML = annotated.map(flightCardHtml).join("");
+    }
+
+    function renderCompareTable() {
+      const flights = compareIds.map(getFlightById).filter(Boolean);
+      ["cmp-h1", "cmp-h2", "cmp-h3"].forEach((hid, i) => {
+        const h = document.getElementById(hid);
+        h.textContent = flights[i] ? `${flights[i].origin}-${flights[i].dest} ${flights[i].flightNo}` : "—";
+      });
+      const rows = [
+        { label: "航司", key: "airline" },
+        { label: "出发", key: "depart" },
+        { label: "到达", key: "arrive" },
+        { label: "时长", key: "_dur" },
+        { label: "经停", key: "_stop" },
+        { label: hasReturnDate() ? "单程参考" : "价格(参考)", key: "_price" }
+      ];
+      if (hasReturnDate()) {
+        rows.push({ label: "往返演示总价", key: "_rt" });
+      }
+      rows.push(
+        { label: "折扣", key: "discount" },
+        { label: "含税", key: "_tax" },
+        { label: "退改", key: "_ref" }
+      );
+      const body = document.getElementById("compare-body");
+      body.innerHTML = rows
+        .map((row) => {
+          const cells = [0, 1, 2].map((i) => {
+            const f = flights[i];
+            if (!f) return "<td>—</td>";
+            let val = "";
+            switch (row.key) {
+              case "_dur":
+                val = formatDuration(f.durationMin);
+                break;
+              case "_stop":
+                val = f.stops === 0 ? "直飞" : f.stops + " 次";
+                break;
+              case "_price":
+                val = "¥" + effectivePrice(f);
+                break;
+              case "_rt":
+                val = "¥" + tripPriceForFilter(f);
+                break;
+              case "_tax":
+                val = f.taxIncluded ? "是" : "否(已估算)";
+                break;
+              case "_ref":
+                val = f.refundable ? "可退改" : "受限";
+                break;
+              default:
+                val = f[row.key];
+            }
+            return `<td>${escapeHtml(String(val))}</td>`;
+          });
+          return `<tr><th>${escapeHtml(row.label)}</th>${cells.join("")}</tr>`;
+        })
+        .join("");
+    }
+
+    // ---------- 导航切换（含地址栏 #hash、无障碍） ----------
+    const PANEL_KEYS = ["home", "search", "explore", "saved", "rules"];
+
+    function switchPanel(id, opts) {
+      const options = opts || {};
+      const skipHash = options.skipHash === true;
+      if (!PANEL_KEYS.includes(id)) id = "home";
+
+      document.querySelectorAll(".panel").forEach((p) => {
+        const on = p.id === "panel-" + id;
+        p.classList.toggle("active", on);
+        p.setAttribute("aria-hidden", on ? "false" : "true");
+      });
+      document.querySelectorAll(".nav-tab").forEach((t) => {
+        const on = t.getAttribute("data-panel") === id;
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.setAttribute("tabindex", on ? "0" : "-1");
+      });
+
+      if (!skipHash && history.replaceState) {
+        try {
+          const path = location.pathname + location.search;
+          if (id === "home") {
+            history.replaceState(null, "", path);
+          } else {
+            history.replaceState(null, "", path + "#" + id);
+          }
+        } catch (err) {
+          /* 少数浏览器在 file:// 下限制 replaceState，忽略即可 */
+        }
+      }
+
+      if (id === "saved") {
+        renderFavorites();
+        renderCompareTable();
+      }
+      window.scrollTo(0, 0);
+    }
+
+    /** 首次打开时若地址栏带 #search 等，自动打开对应栏目 */
+    function applyHashFromLocation() {
+      const h = (location.hash || "").replace(/^#/, "");
+      if (PANEL_KEYS.includes(h)) {
+        switchPanel(h, { skipHash: true });
+      }
+    }
+
+    // ---------- 初始化日期默认值（演示用） ----------
+    function initDates() {
+      const d = new Date();
+      const iso = d.toISOString().slice(0, 10);
+      document.getElementById("q-depart").value = iso;
+      const r = new Date(d);
+      r.setDate(r.getDate() + 5);
+      document.getElementById("q-return").value = r.toISOString().slice(0, 10);
+    }
+
+    function fillAirlineSelect() {
+      var sel = document.getElementById("f-airline");
+      while (sel.options.length > 1) {
+        sel.remove(1);
+      }
+      uniqueAirlines().forEach(function (a) {
+        var o = document.createElement("option");
+        o.value = a;
+        o.textContent = a;
+        sel.appendChild(o);
+      });
+    }
+
+    function setLibraryStat() {
+      var el = document.getElementById("library-stat");
+      if (!el) return;
+      el.innerHTML =
+        "演示航班库共 <strong>" + MOCK_FLIGHTS.length + "</strong> 条，与首页推荐、本页列表、收藏卡片同源。";
+    }
+
+    // ---------- 事件绑定 ----------
+    document.getElementById("logo-home").addEventListener("click", function () {
+      switchPanel("home");
+    });
+
+    document.querySelectorAll(".nav-tab").forEach((tab) => {
+      tab.addEventListener("click", function () {
+        switchPanel(tab.getAttribute("data-panel"));
+      });
+    });
+
+    document.querySelector(".nav-tabs").addEventListener("keydown", function (e) {
+      const tabs = Array.prototype.slice.call(document.querySelectorAll(".nav-tab"));
+      const i = tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      let n = i;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        n = (i + 1) % tabs.length;
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        n = (i - 1 + tabs.length) % tabs.length;
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        n = 0;
+      } else if (e.key === "End") {
+        e.preventDefault();
+        n = tabs.length - 1;
+      } else {
+        return;
+      }
+      tabs[n].focus();
+      switchPanel(tabs[n].getAttribute("data-panel"));
+    });
+
+    window.addEventListener("hashchange", function () {
+      let h = (location.hash || "").replace(/^#/, "");
+      if (!PANEL_KEYS.includes(h)) h = "home";
+      switchPanel(h, { skipHash: true });
+    });
+
+    document.getElementById("trip-oneway").addEventListener("click", function () {
+      document.getElementById("trip-oneway").setAttribute("aria-pressed", "true");
+      document.getElementById("trip-round").setAttribute("aria-pressed", "false");
+      syncTripModeUi();
+      scheduleSearchImmediate(true);
+    });
+    document.getElementById("trip-round").addEventListener("click", function () {
+      document.getElementById("trip-round").setAttribute("aria-pressed", "true");
+      document.getElementById("trip-oneway").setAttribute("aria-pressed", "false");
+      syncTripModeUi();
+      var ret = document.getElementById("q-return");
+      if (ret && !ret.value) {
+        var d = new Date(document.getElementById("q-depart").value || Date.now());
+        d.setDate(d.getDate() + 5);
+        ret.value = d.toISOString().slice(0, 10);
+      }
+      scheduleSearchImmediate(true);
+    });
+    document.getElementById("btn-swap-od").addEventListener("click", function () {
+      var a = document.getElementById("q-origin");
+      var b = document.getElementById("q-dest");
+      var t = a.value;
+      a.value = b.value;
+      b.value = t;
+      scheduleSearchImmediate(true);
+      showToast("已交换出发地与目的地");
+    });
+    document.getElementById("chip-origins").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-chip-orig]");
+      if (!b) return;
+      document.getElementById("q-origin").value = b.getAttribute("data-chip-orig");
+      scheduleSearch(true);
+    });
+    document.getElementById("chip-dests").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-chip-dest]");
+      if (!b) return;
+      document.getElementById("q-dest").value = b.getAttribute("data-chip-dest");
+      scheduleSearch(true);
+    });
+    document.querySelectorAll("[data-date-offset]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var off = parseInt(btn.getAttribute("data-date-offset"), 10);
+        var d = new Date();
+        d.setDate(d.getDate() + off);
+        document.getElementById("q-depart").value = d.toISOString().slice(0, 10);
+        scheduleSearchImmediate(true);
+      });
+    });
+    document.getElementById("sort-results").addEventListener("change", function () {
+      scheduleSearchImmediate(true);
+    });
+    document.getElementById("price-modal-close").addEventListener("click", closePriceModal);
+    document.getElementById("price-modal").addEventListener("click", function (e) {
+      if (e.target.id === "price-modal") closePriceModal();
+    });
+    var modalSheet = document.querySelector("#price-modal .modal-sheet");
+    if (modalSheet) {
+      modalSheet.addEventListener("click", function (e) {
+        e.stopPropagation();
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      var modalEl = document.getElementById("price-modal");
+      if (modalEl && modalEl.classList.contains("open")) {
+        closePriceModal();
+      }
+    });
+    document.getElementById("foot-rules").addEventListener("click", function () {
+      switchPanel("rules");
+    });
+    document.getElementById("foot-service").addEventListener("click", function () {
+      showToast("客服热线（演示）：400-000-3188 · 工作日 9:00–18:00");
+    });
+    document.getElementById("foot-about").addEventListener("click", function () {
+      showToast("云航特价：聚焦低价机票发现与比价的界面原型，仅供学习/测评展示。");
+    });
+
+    document.getElementById("hero-to-search").addEventListener("click", function () {
+      switchPanel("search");
+    });
+    document.getElementById("hero-to-explore").addEventListener("click", function () {
+      switchPanel("explore");
+    });
+    document.getElementById("btn-goto-saved").addEventListener("click", function () {
+      switchPanel("saved");
+    });
+
+    ["q-origin", "q-dest", "q-budget-min", "q-budget-max", "q-depart", "q-return"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", function () {
+        scheduleSearch(true);
+      });
+    });
+    ["f-direct", "f-airline", "f-max-hours", "f-tax", "f-refund"].forEach((id) => {
+      document.getElementById(id).addEventListener("change", function () {
+        scheduleSearchImmediate(true);
+      });
+    });
+
+    document.getElementById("btn-reset-filters").addEventListener("click", function () {
+      document.getElementById("trip-round").setAttribute("aria-pressed", "true");
+      document.getElementById("trip-oneway").setAttribute("aria-pressed", "false");
+      document.getElementById("q-origin").value = "";
+      document.getElementById("q-dest").value = "";
+      document.getElementById("q-budget-min").value = "";
+      document.getElementById("q-budget-max").value = "";
+      document.getElementById("f-direct").checked = false;
+      document.getElementById("f-airline").value = "";
+      document.getElementById("f-max-hours").value = "";
+      document.getElementById("f-tax").checked = true;
+      document.getElementById("f-refund").checked = false;
+      initDates();
+      syncTripModeUi();
+      scheduleSearchImmediate(true);
+    });
+
+    document.getElementById("btn-clear-filters").addEventListener("click", function () {
+      document.getElementById("q-origin").value = "";
+      document.getElementById("q-dest").value = "";
+      document.getElementById("q-budget-min").value = "";
+      document.getElementById("q-budget-max").value = "";
+      document.getElementById("f-direct").checked = false;
+      document.getElementById("f-airline").value = "";
+      document.getElementById("f-max-hours").value = "";
+      document.getElementById("f-refund").checked = false;
+      document.getElementById("f-tax").checked = true;
+      scheduleSearchImmediate(true);
+      showToast("已清空出发地、目的地、预算和勾选条件（日期与返程保留）");
+    });
+
+    document.getElementById("search-results").addEventListener("click", function (e) {
+      var det = e.target.closest("[data-detail-id]");
+      if (det) {
+        var f1 = getFlightById(det.getAttribute("data-detail-id"));
+        if (f1) openPriceModal(f1);
+        return;
+      }
+      var bk = e.target.closest("[data-book-id]");
+      if (bk) {
+        showToast("演示环境无法支付。真实产品将跳转填单页或合作售票平台。");
+        return;
+      }
+      var sug = e.target.closest("[data-suggest-id]");
+      if (sug) {
+        var fid = sug.getAttribute("data-suggest-id");
+        var fl = getFlightById(fid);
+        if (fl) {
+          document.getElementById("q-origin").value = fl.origin;
+          document.getElementById("q-dest").value = fl.dest;
+          scheduleSearchImmediate(true);
+          showToast("已填入「" + fl.origin + " → " + fl.dest + "」并刷新列表");
+        }
+        return;
+      }
+      var btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      var id = btn.getAttribute("data-id");
+      if (btn.getAttribute("data-action") === "fav") toggleFavorite(id);
+      if (btn.getAttribute("data-action") === "cmp") toggleCompare(id);
+    });
+
+    document.getElementById("favorites-list").addEventListener("click", function (e) {
+      var det = e.target.closest("[data-detail-id]");
+      if (det) {
+        var f2 = getFlightById(det.getAttribute("data-detail-id"));
+        if (f2) openPriceModal(f2);
+        return;
+      }
+      var bk = e.target.closest("[data-book-id]");
+      if (bk) {
+        showToast("演示环境无法支付。真实产品将跳转填单页或合作售票平台。");
+        return;
+      }
+      var btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      var id = btn.getAttribute("data-id");
+      if (btn.getAttribute("data-action") === "fav") toggleFavorite(id);
+      if (btn.getAttribute("data-action") === "cmp") toggleCompare(id);
+    });
+
+    document.getElementById("explore-grid").addEventListener("click", function (e) {
+      const card = e.target.closest(".dest-card");
+      if (!card) return;
+      document.getElementById("q-origin").value = card.getAttribute("data-from") || "";
+      document.getElementById("q-dest").value = card.getAttribute("data-dest") || "";
+      switchPanel("search");
+      scheduleSearchImmediate(true);
+    });
+
+    // ---------- 启动 ----------
+    fillAirlineSelect();
+    initDates();
+    syncTripModeUi();
+    renderPopularChips();
+    renderHome();
+    renderExplore();
+    applyHashFromLocation();
+    runSearch(false);
+    setLibraryStat();
+    updateCompareBar();
+    renderCompareTable();
+    tickHeaderClock();
+    setInterval(tickHeaderClock, 30000);
+  </script>
+</body>
+</html>
