@@ -1050,22 +1050,26 @@
 
     .dest-visual {
       position: relative;
-      height: 128px;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      min-height: 148px;
       overflow: hidden;
       background: linear-gradient(135deg, #0e7490, #0f172a);
     }
 
+    /* 与下图 CDN 裁剪比例一致，避免窄条里再裁一层导致「看不全」 */
     .dest-cover-img {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center center;
       transition: transform 0.35s ease;
     }
 
     .dest-card:hover .dest-cover-img {
-      transform: scale(1.04);
+      transform: scale(1.02);
     }
 
     .dest-visual-overlay {
@@ -2648,12 +2652,18 @@
 
     /** 目的地探索卡片封面（Unsplash，仅作展示） */
     const DEST_CITY_COVER = {
-      曼谷: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=800&q=75",
-      大阪: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=800&q=75",
-      青岛: "https://images.unsplash.com/photo-1578932750290-fadf513aa40f?auto=format&fit=crop&w=800&q=75",
-      丽江: "https://images.unsplash.com/photo-1526832645124-daf0ff1e1565?auto=format&fit=crop&w=800&q=75",
-      新加坡: "https://images.unsplash.com/photo-1525625293380-38f3c991795b?auto=format&fit=crop&w=800&q=75",
-      三亚: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=800&q=75",
+      曼谷:
+        "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=960&h=720&q=75",
+      大阪:
+        "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=960&h=720&q=75",
+      青岛:
+        "https://images.unsplash.com/photo-1578932750290-fadf513aa40f?auto=format&fit=crop&w=960&h=720&q=75",
+      丽江:
+        "https://images.unsplash.com/photo-1526832645124-daf0ff1e1565?auto=format&fit=crop&w=960&h=720&q=75",
+      新加坡:
+        "https://images.unsplash.com/photo-1525625293380-38f3c991795b?auto=format&fit=crop&w=960&h=720&q=75",
+      三亚:
+        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=960&h=720&q=75",
     };
 
     // ---------- 工具函数 ----------
@@ -3618,7 +3628,7 @@
         var imgHtml = cover
           ? '<img class="dest-cover-img" src="' +
             escapeHtml(cover) +
-            '" alt="" loading="lazy" decoding="async" onerror="this.closest(\'.dest-visual\').classList.add(\'dest-visual--fallback\');this.remove();" />'
+            '" alt="" width="960" height="720" loading="lazy" decoding="async" sizes="(max-width: 540px) 100vw, (max-width: 1000px) 50vw, 340px" onerror="this.closest(\'.dest-visual\').classList.add(\'dest-visual--fallback\');this.remove();" />'
           : "";
         return (
           '<article class="dest-card" data-dest="' +
