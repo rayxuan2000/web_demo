@@ -28,15 +28,21 @@
    git remote add origin https://github.com/你的用户名/仓库名.git
    git push -u origin main
 
-3. 打开仓库 Settings → Pages（页面）。
+3. 先 push 一次代码（见上），让 Actions 跑通并自动创建 gh-pages 分支。
 
-4. 「Build and deployment」里 Source 选：GitHub Actions。
+4. 打开仓库 Settings → Pages。
 
-5. 再随便改一次「特价机票发现平台.html」并 push，或到 Actions 里手动重新运行工作流。
+5. 「Build and deployment」里：
+   Source 选：Deploy from a branch（从分支部署）
+   Branch 选：gh-pages   文件夹选：/ (root)
+
+   （不要选「GitHub Actions」——当前工作流用的是「推送到 gh-pages 分支」方式，
+    可避免 configure-pages 在未开站时的 404 报错。）
+
+6. 保存后等 1～2 分钟，用 https://你的用户名.github.io/仓库名/ 访问。
+
    工作流文件：.github/workflows/github-pages.yml
-   它会把「特价机票发现平台.html」复制为网站的 index.html 再发布。
-
-6. 等待 Actions 里绿色勾出现后，用上面的 https://用户名.github.io/仓库名/ 访问。
+   每次 push 会把「特价机票发现平台.html」打成 _site/index.html 并推到 gh-pages。
 
 以后每次更新：
   只改「特价机票发现平台.html」→ git add → git commit → git push

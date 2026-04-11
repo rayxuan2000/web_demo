@@ -1,4 +1,6 @@
-# 推送 main/master 后自动发布；固定链接：https://<用户>.github.io/<仓库>/
+# 推送到 main/master 后，把页面发布到 gh-pages 分支
+# 仓库 Settings → Pages → Source 选「Deploy from a branch」→ gh-pages / root
+# 访问：https://<用户名>.github.io/<仓库名>/
 name: Deploy to GitHub Pages
 
 on:
@@ -6,23 +8,18 @@ on:
     branches: ["main", "master"]
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
 
       - name: Prepare site（特价页 → index.html）
         run: |
@@ -30,18 +27,8 @@ jobs:
           cp "特价机票发现平台.html" _site/index.html
           touch _site/.nojekyll
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Push to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          folder: _site
+          branch: gh-pages
